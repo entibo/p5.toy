@@ -1,0 +1,18 @@
+{
+  "name": "p5.toy",
+  "version": "0.1.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "webpack"
+  },
+  "author": "Thibaut Guénédal <contact@entibo.fr>",
+  "license": "MIT",
+  "devDependencies": {
+    "webpack": "~1.13.1",
+    "html-loader": "~0.4.3",
+    "css-loader": "~0.23.1",
+    "es6-promise": "~3.2.1",
+    "style-loader": "~0.13.1"
+  }
+}

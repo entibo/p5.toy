@@ -2324,7 +2324,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
     }
 
     if (object[property] === undefined) {
-      if(object === window && val) object[property] = val;
+      if(object === window && val !== undefined) object[property] = val;
       else throw new Error("Object " + object + " has no property \"" + property + "\"");
     }
 

@@ -48,11 +48,11 @@ p5.prototype.createToy = function(a) {
 	gui.remember();
 
 	gui.setMinHeight(200);
-	gui.setMaxHeight(context.height-80);
+	gui.setMaxHeight(context.height-60);
 
 	var rC = function() {
 		context.resizeCanvas(context.width, context.height);
-		gui.setMaxHeight(context.height-80);
+		gui.setMaxHeight(context.height-60);
 	};
 	var globalParams = gui.addFolder("Global settings");
 	globalParams.add(context, "width").listen().onChange(rC).min(0).step(5).name("Canvas width");
@@ -80,6 +80,8 @@ p5.prototype.createToy = function(a) {
 	});
 
 	var playBtn = document.getElementById("p5toy-play");
+	var snapBtn = document.getElementById("p5toy-snapshot"),
+		pngLink = document.getElementById("p5toy-png");
 	var recordBtn = document.getElementById("p5toy-record"),
 		recordProgress1 = document.getElementsByClassName("p5toy-record-progress-1")[0],
 		recordProgress2 = document.getElementsByClassName("p5toy-record-progress-2")[0],
@@ -106,6 +108,17 @@ p5.prototype.createToy = function(a) {
 		playBtn.classList.remove("p5toy-paused");
 	});
 
+	snapBtn.addEventListener("click", function() {
+		snapBtn.classList.add("p5toy-download");
+		var dataUri = context._curElement.elt.toDataURL("image/png");
+		pngLink.setAttribute("href", dataUri);
+	});
+
+	pngLink.addEventListener("click", function(e) {
+		snapBtn.classList.remove("p5toy-download");
+		e.stopPropagation();
+	});
+
 	recordBtn.addEventListener("click", function() {
 		if(context._gif) {
 			context.stopRecordButton();
@@ -127,9 +140,9 @@ p5.prototype.createToy = function(a) {
 		var gif = e.detail;
 		recordBtn.classList.add("p5toy-recording");
 		gif.on("progress", function(p) {
-			recordProgress1.style.width = ((p/0.2)%1)*50 + "px";
-			recordProgress1.style.marginTop = Math.floor(p/0.2)*10 + "px";
-			recordProgress2.style.height = Math.floor(p/0.2)*10 + "px";
+			recordProgress1.style.width = ((p/0.2)%1)*37.2 + "px";
+			recordProgress1.style.marginTop = Math.floor(p/0.2)*7.44 + "px";
+			recordProgress2.style.height = Math.floor(p/0.2)*7.44 + "px";
 		});
 		gif.on("finished", function(blob) {
 			recordBtn.classList.add("p5toy-download");

@@ -332,6 +332,11 @@
 #p5toy-container .cr.object.color {
 	overflow: visible;
 }
+
+#p5toy-container .closed .cr.object.color {
+    overflow: hidden;
+}
+
 #p5toy-container .dg .c {
 	position: relative;
 }

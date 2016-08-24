@@ -1,20 +1,19 @@
 
 var GIF = require("./gif");
 
-var properties = {
-	gifWorkers: 2,
-	gifQuality: 100,
-	gifFps: 60,
-	_gif: null,
-	_gifRendering: false,
-	_gifStartFrameCount: null,
-	_getLastFrame: false,
-	_gifStopCondition: null
-};
-
-for(var p in properties) {
-	p5.prototype[p] = properties[p];
-}
+p5.prototype.registerMethod("init", function() {
+	this.gifWorkers = 2;
+	this.gifQuality = 100;
+	this.gifFps = 30;
+	this._gif = null;
+	this._gifRendering = false;
+	this._gifStartFrameCount = null;
+	this._getLastFrame = false;
+	this._gifStopCondition = null;
+	this._gifDefaultFinishedCallback = function(blob) {
+		window.open(URL.createObjectURL(blob));
+	};
+});
 
 p5.prototype.startGif = function(stop) {
 	var context = this._isGlobal ? window : this;
@@ -25,10 +24,7 @@ p5.prototype.startGif = function(stop) {
 	context._gifStartFrameCount = context.frameCount;
 	context._getLastFrame = false;
 	context._gifStopCondition = stop || function() { return false };
-	// context._gif.on("finished", function(blob) {
-	// 	window.open(URL.createObjectURL(blob));
-	// });
-	window.dispatchEvent(new CustomEvent("gif", {detail: context._gif}));
+	context._gif.addListener("finished", context._gifDefaultFinishedCallback);
 	return context._gif;
 }
 
@@ -52,7 +48,6 @@ p5.prototype._stopGif = function() {
 	context._gif.on("finished", function() { 
 		context._gifRendering = false; 
 		context._gif = null;
-		//window.dispatchEvent(new Event("noGif"));
 	});
 	context._gifRendering = true;
 }

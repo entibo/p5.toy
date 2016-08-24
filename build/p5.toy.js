@@ -46,522 +46,30 @@
 
 	
 	__webpack_require__(1);
-	__webpack_require__(2);
-	__webpack_require__(4);
+	__webpack_require__(3);
+	__webpack_require__(5);
 
-	p5.prototype.toggleLoop = function() {
-		if(this._loop) this.noLoop();
-		else this.loop();
-	}
-
-	p5.prototype.isLooping = function() {
-		return this._loop;
-	}
-
-	var _noLoop = p5.prototype.noLoop;
-	p5.prototype.noLoop = function() { 
-		window.dispatchEvent(new Event("noLoop"));
-		_noLoop.call(this); 
-	};
-	var _loop = p5.prototype.loop;
-	p5.prototype.loop = function() { 
-		window.dispatchEvent(new Event("loop"));
-		_loop.call(this); 
-	};
-
-	p5.prototype.createToy = function(a) {
-
-		var context = this._isGlobal ? window : this;
-		if(a && !(typeof a == "object" && a.appendChild)) {
-			a = document.querySelector(a);
-		}
-		if(!a) a = context._curElement.parent();
-
-		context.playButton = context.loop;
-		context.pauseButton = context.noLoop;
-		context.recordButton = context.startGif;
-		context.stopRecordButton = context.abortGif;
-
-		__webpack_require__(6);
-		var h = __webpack_require__(10);
-		var d = document.createElement("div");
-		d.innerHTML = h;
-		a.appendChild(d.childNodes[0]);
-		context._curElement.parent("p5toy-mainbox");
-
-		var gui = context.createGUI({scrollable: true, autoPlace: false});
-		gui.setParent("p5toy-sidebox");
-		gui.remember();
-
-		gui.setMinHeight(200);
-		gui.setMaxHeight(context.height-60);
-
-		var rC = function() {
-			context.resizeCanvas(context.width, context.height);
-			gui.setMaxHeight(context.height-60);
-		};
-		var globalParams = gui.addFolder("Global settings");
-		globalParams.add(context, "width").listen().onChange(rC).min(0).step(5).name("Canvas width");
-		globalParams.add(context, "height").listen().onChange(rC).min(0).step(5).name("Canvas height");
-		context.targetFPS = 60;
-		globalParams.add(context, "targetFPS").listen().min(0).max(60).step(1).name("Target framerate").onChange(function() {
-			context.frameRate(context.targetFPS);
-		});
-
-		var params = gui.addFolder("Sketch settings");
-		params.open();
-
-		var gifParams = gui.addFolder("Gif settings");
-		gifParams.add(context, "gifFps").listen().min(0).max(60).step(1).name("Framerate");
-		gifParams.add(context, "gifQuality").listen().min(0).max(1000).step(1).name("Quality (0=best)");
-		gifParams.add(context, "gifWorkers").listen().min(1).max(5).step(1).name("Workers");
-
-		window.addEventListener("keydown", function(e) {
-			if(e.ctrlKey && e.altKey) {
-				context.noLoop();
-			}
-			if(e.which == 32) {
-				context.toggleLoop();
-			}
-		});
-
-		var playBtn = document.getElementById("p5toy-play");
-		var snapBtn = document.getElementById("p5toy-snapshot"),
-			pngLink = document.getElementById("p5toy-png");
-		var recordBtn = document.getElementById("p5toy-record"),
-			recordProgress1 = document.getElementsByClassName("p5toy-record-progress-1")[0],
-			recordProgress2 = document.getElementsByClassName("p5toy-record-progress-2")[0],
-			gifBlob = document.getElementById("p5toy-blob");
-		var closeBtn = document.getElementById("p5toy-close");
-		var openBtn = document.getElementById("p5toy-open");
-		var sb = document.getElementById("p5toy-sidebox"),
-			mb = document.getElementById("p5toy-mainbox");
-
-		playBtn.addEventListener("click", function() {
-			if(context.isLooping()) {
-				context.pauseButton();
-			}
-			else {
-				context.playButton();
-			}
-		});
-
-		window.addEventListener("noLoop", function() {
-			playBtn.classList.add("p5toy-paused");
-		});
-
-		window.addEventListener("loop", function() {
-			playBtn.classList.remove("p5toy-paused");
-		});
-
-		snapBtn.addEventListener("click", function() {
-			snapBtn.classList.add("p5toy-download");
-			var dataUri = context._curElement.elt.toDataURL("image/png");
-			pngLink.setAttribute("href", dataUri);
-		});
-
-		pngLink.addEventListener("click", function(e) {
-			snapBtn.classList.remove("p5toy-download");
-			e.stopPropagation();
-		});
-
-		recordBtn.addEventListener("click", function() {
-			if(context._gif) {
-				context.stopRecordButton();
-			}
-			else {
-				context.recordButton();
-			}
-		});
-
-		window.addEventListener("noGif", function() {
-			recordProgress1.style.width = 0;
-			recordProgress1.style.marginTop = 0;
-			recordProgress2.style.height = 0;
-			recordBtn.classList.remove("p5toy-recording");
-			recordBtn.classList.remove("p5toy-download");
-		});
-
-		window.addEventListener("gif", function(e) {
-			var gif = e.detail;
-			recordBtn.classList.add("p5toy-recording");
-			gif.on("progress", function(p) {
-				recordProgress1.style.width = ((p/0.2)%1)*37.2 + "px";
-				recordProgress1.style.marginTop = Math.floor(p/0.2)*7.44 + "px";
-				recordProgress2.style.height = Math.floor(p/0.2)*7.44 + "px";
-			});
-			gif.on("finished", function(blob) {
-				recordBtn.classList.add("p5toy-download");
-				recordProgress2.style.height = null;
-				gifBlob.setAttribute("href", URL.createObjectURL(blob));
-			});
-		});
-
-		gifBlob.addEventListener("click", function(e) {
-			recordBtn.classList.remove("p5toy-recording");
-			recordBtn.classList.remove("p5toy-download");
-			e.stopPropagation();
-		});
-
-		closeBtn.addEventListener("click", function() {
-			sb.classList.add("p5toy-sbHidden");
-			mb.classList.add("p5toy-sbHidden");
-		});
-
-		openBtn.addEventListener("click", function() {
-			sb.classList.remove("p5toy-sbHidden");
-			mb.classList.remove("p5toy-sbHidden");
-		});		
-
-		context.globalParams = globalParams;
-		context.params = params;
-		context.gifParams = gifParams;
-
-	};
 
 /***/ },
 /* 1 */
-/***/ function(module, exports) {
-
-	/**
-	Taken from https://github.com/DelvarWorld/easing-utils
-	**/
-
-	// No easing, no acceleration
-	p5.prototype.linear = function( t ) {
-	    return t;
-	}
-
-	// Slight acceleration from zero to full speed
-	p5.prototype.easeInSine = function( t ) {
-	    return -1 * Math.cos( t * ( Math.PI / 2 ) ) + 1;
-	}
-
-	// Slight deceleration at the end
-	p5.prototype.easeOutSine = function( t ) {
-	    return Math.sin( t * ( Math.PI / 2 ) );
-	}
-
-	// Slight acceleration at beginning and slight deceleration at end
-	p5.prototype.easeInOutSine = function( t ) {
-	    return -0.5 * ( Math.cos( Math.PI * t ) - 1 );
-	}
-
-	// Accelerating from zero velocity
-	p5.prototype.easeInQuad = function( t ) {
-	    return t * t;
-	}
-
-	// Decelerating to zero velocity
-	p5.prototype.easeOutQuad = function( t ) {
-	    return t * ( 2 - t );
-	}
-
-	// Acceleration until halfway, then deceleration
-	p5.prototype.easeInOutQuad = function( t ) {
-	    return t < 0.5 ? 2 * t * t : - 1 + ( 4 - 2 * t ) * t;
-	}
-
-	// Accelerating from zero velocity
-	p5.prototype.easeInCubic = function( t ) {
-	    return t * t * t;
-	}
-
-	// Decelerating to zero velocity
-	p5.prototype.easeOutCubic = function( t ) {
-	    var t1 = t - 1;
-	    return t1 * t1 * t1 + 1;
-	}
-
-	// Acceleration until halfway, then deceleration
-	p5.prototype.easeInOutCubic = function( t ) {
-	    return t < 0.5 ? 4 * t * t * t : ( t - 1 ) * ( 2 * t - 2 ) * ( 2 * t - 2 ) + 1;
-	}
-
-	// Accelerating from zero velocity
-	p5.prototype.easeInQuart = function( t ) {
-	    return t * t * t * t;
-	}
-
-	// Decelerating to zero velocity
-	p5.prototype.easeOutQuart = function( t ) {
-	    var t1 = t - 1;
-	    return 1 - t1 * t1 * t1 * t1;
-	}
-
-	// Acceleration until halfway, then deceleration
-	p5.prototype.easeInOutQuart = function( t ) {
-	    var t1 = t - 1;
-	    return t < 0.5 ? 8 * t * t * t * t : 1 - 8 * t1 * t1 * t1 * t1;
-	}
-
-	// Accelerating from zero velocity
-	p5.prototype.easeInQuint = function( t ) {
-	    return t * t * t * t * t;
-	}
-
-	// Decelerating to zero velocity
-	p5.prototype.easeOutQuint = function( t ) {
-	    var t1 = t - 1;
-	    return 1 + t1 * t1 * t1 * t1 * t1;
-	}
-
-	// Acceleration until halfway, then deceleration
-	p5.prototype.easeInOutQuint = function( t ) {
-	    var t1 = t - 1;
-	    return t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * t1 * t1 * t1 * t1 * t1;
-	}
-
-	// Accelerate exponentially until finish
-	p5.prototype.easeInExpo = function( t ) {
-
-	    if( t === 0 ) {
-	        return 0;
-	    }
-
-	    return Math.pow( 2, 10 * ( t - 1 ) );
-
-	}
-
-	// Initial exponential acceleration slowing to stop
-	p5.prototype.easeOutExpo = function( t ) {
-
-	    if( t === 1 ) {
-	        return 1;
-	    }
-
-	    return ( -Math.pow( 2, -10 * t ) + 1 );
-
-	}
-
-	// Exponential acceleration and deceleration
-	p5.prototype.easeInOutExpo = function( t ) {
-	    
-	    if( t === 0 || t === 1 ) {
-	        return t;
-	    }
-
-	    var scaledTime = t * 2;
-	    var scaledTime1 = scaledTime - 1;
-
-	    if( scaledTime < 1 ) {
-	        return 0.5 * Math.pow( 2, 10 * ( scaledTime1 ) );
-	    }
-
-	    return 0.5 * ( -Math.pow( 2, -10 * scaledTime1 ) + 2 );
-
-	}
-
-	// Increasing velocity until stop
-	p5.prototype.easeInCirc = function( t ) {
-
-	    var scaledTime = t / 1;
-	    return -1 * ( Math.sqrt( 1 - scaledTime * t ) - 1 );
-
-	}
-
-	// Start fast, decreasing velocity until stop
-	p5.prototype.easeOutCirc = function( t ) {
-
-	    var t1 = t - 1;
-	    return Math.sqrt( 1 - t1 * t1 );
-
-	}
-
-	// Fast increase in velocity, fast decrease in velocity
-	p5.prototype.easeInOutCirc = function( t ) {
-
-	    var scaledTime = t * 2;
-	    var scaledTime1 = scaledTime - 2;
-
-	    if( scaledTime < 1 ) {
-	        return -0.5 * ( Math.sqrt( 1 - scaledTime * scaledTime ) - 1 );
-	    }
-
-	    return 0.5 * ( Math.sqrt( 1 - scaledTime1 * scaledTime1 ) + 1 );
-
-	}
-
-	// Slow movement backwards then fast snap to finish
-	p5.prototype.easeInBack = function( t, magnitude ) {
-
-	    if(magnitude === undefined) magnitude = 1.70158;
-	    var scaledTime = t / 1;
-	    return scaledTime * scaledTime * ( ( magnitude + 1 ) * scaledTime - magnitude );
-
-	}
-
-	// Fast snap to backwards point then slow resolve to finish
-	p5.prototype.easeOutBack = function( t, magnitude ) {
-
-	    if(magnitude === undefined) magnitude = 1.70158;
-	    var scaledTime = ( t / 1 ) - 1;
-	    
-	    return (
-	        scaledTime * scaledTime * ( ( magnitude + 1 ) * scaledTime + magnitude )
-	    ) + 1;
-
-	}
-
-	// Slow movement backwards, fast snap to past finish, slow resolve to finish
-	p5.prototype.easeInOutBack = function( t, magnitude ) {
-
-	    if(magnitude === undefined) magnitude = 1.70158;
-	    var scaledTime = t * 2;
-	    var scaledTime2 = scaledTime - 2;
-
-	    var s = magnitude * 1.525;
-
-	    if( scaledTime < 1) {
-
-	        return 0.5 * scaledTime * scaledTime * (
-	            ( ( s + 1 ) * scaledTime ) - s
-	        );
-
-	    }
-
-	    return 0.5 * (
-	        scaledTime2 * scaledTime2 * ( ( s + 1 ) * scaledTime2 + s ) + 2
-	    );
-
-	}
-	// Bounces slowly then quickly to finish
-	p5.prototype.easeInElastic = function( t, magnitude ) {
-
-	    if(magnitude === undefined) magnitude = 0.7;
-	    if( t === 0 || t === 1 ) {
-	        return t;
-	    }
-
-	    var scaledTime = t / 1;
-	    var scaledTime1 = scaledTime - 1;
-
-	    var p = 1 - magnitude;
-	    var s = p / ( 2 * Math.PI ) * Math.asin( 1 );
-
-	    return -(
-	        Math.pow( 2, 10 * scaledTime1 ) *
-	        Math.sin( ( scaledTime1 - s ) * ( 2 * Math.PI ) / p )
-	    );
-
-	}
-
-	// Fast acceleration, bounces to zero
-	p5.prototype.easeOutElastic = function( t, magnitude ) {
-
-	    if(magnitude === undefined) magnitude = 0.7;
-	    var p = 1 - magnitude;
-	    var scaledTime = t * 2;
-
-	    if( t === 0 || t === 1 ) {
-	        return t;
-	    }
-
-	    var s = p / ( 2 * Math.PI ) * Math.asin( 1 );
-	    return (
-	        Math.pow( 2, -10 * scaledTime ) *
-	        Math.sin( ( scaledTime - s ) * ( 2 * Math.PI ) / p )
-	    ) + 1;
-
-	}
-
-	// Slow start and end, two bounces sandwich a fast motion
-	p5.prototype.easeInOutElastic = function( t, magnitude ) {
-
-	    if(magnitude === undefined) magnitude = 0.65;
-	    var p = 1 - magnitude;
-
-	    if( t === 0 || t === 1 ) {
-	        return t;
-	    }
-
-	    var scaledTime = t * 2;
-	    var scaledTime1 = scaledTime - 1;
-	    
-	    var s = p / ( 2 * Math.PI ) * Math.asin( 1 );
-
-	    if( scaledTime < 1 ) {
-	        return -0.5 * (
-	            Math.pow( 2, 10 * scaledTime1 ) *
-	            Math.sin( ( scaledTime1 - s ) * ( 2 * Math.PI ) / p )
-	        );
-	    }
-
-	    return (
-	        Math.pow( 2, -10 * scaledTime1 ) *
-	        Math.sin( ( scaledTime1 - s ) * ( 2 * Math.PI ) / p ) * 0.5
-	    ) + 1;
-
-	}
-
-	// Bounce to completion
-	p5.prototype.easeOutBounce = function( t ) {
-
-	    var scaledTime = t / 1;
-
-	    if( scaledTime < ( 1 / 2.75 ) ) {
-
-	        return 7.5625 * scaledTime * scaledTime;
-
-	    } else if( scaledTime < ( 2 / 2.75 ) ) {
-
-	        var scaledTime2 = scaledTime - ( 1.5 / 2.75 );
-	        return ( 7.5625 * scaledTime2 * scaledTime2 ) + 0.75;
-
-	    } else if( scaledTime < ( 2.5 / 2.75 ) ) {
-
-	        var scaledTime2 = scaledTime - ( 2.25 / 2.75 );
-	        return ( 7.5625 * scaledTime2 * scaledTime2 ) + 0.9375;
-
-	    } else {
-
-	        var scaledTime2 = scaledTime - ( 2.625 / 2.75 );
-	        return ( 7.5625 * scaledTime2 * scaledTime2 ) + 0.984375;
-
-	    }
-
-	}
-
-	// Bounce increasing in velocity until completion
-	p5.prototype.easeInBounce = function( t ) {
-	    return 1 - this.easeOutBounce( 1 - t );
-	}
-
-	// Bounce in and bounce out
-	p5.prototype.easeInOutBounce = function( t ) {
-
-	    if( t < 0.5 ) {
-
-	        return this.easeInBounce( t * 2 ) * 0.5;
-	        
-	    }
-
-	    return ( this.easeOutBounce( ( t * 2 ) - 1 ) * 0.5 ) + 0.5;
-
-	}
-
-
-/***/ },
-/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
-	var GIF = __webpack_require__(3);
+	var GIF = __webpack_require__(2);
 
-	var properties = {
-		gifWorkers: 2,
-		gifQuality: 100,
-		gifFps: 60,
-		_gif: null,
-		_gifRendering: false,
-		_gifStartFrameCount: null,
-		_getLastFrame: false,
-		_gifStopCondition: null
-	};
-
-	for(var p in properties) {
-		p5.prototype[p] = properties[p];
-	}
+	p5.prototype.registerMethod("init", function() {
+		this.gifWorkers = 2;
+		this.gifQuality = 100;
+		this.gifFps = 30;
+		this._gif = null;
+		this._gifRendering = false;
+		this._gifStartFrameCount = null;
+		this._getLastFrame = false;
+		this._gifStopCondition = null;
+		this._gifDefaultFinishedCallback = function(blob) {
+			window.open(URL.createObjectURL(blob));
+		};
+	});
 
 	p5.prototype.startGif = function(stop) {
 		var context = this._isGlobal ? window : this;
@@ -572,10 +80,7 @@
 		context._gifStartFrameCount = context.frameCount;
 		context._getLastFrame = false;
 		context._gifStopCondition = stop || function() { return false };
-		// context._gif.on("finished", function(blob) {
-		// 	window.open(URL.createObjectURL(blob));
-		// });
-		window.dispatchEvent(new CustomEvent("gif", {detail: context._gif}));
+		context._gif.addListener("finished", context._gifDefaultFinishedCallback);
 		return context._gif;
 	}
 
@@ -599,7 +104,6 @@
 		context._gif.on("finished", function() { 
 			context._gifRendering = false; 
 			context._gif = null;
-			//window.dispatchEvent(new Event("noGif"));
 		});
 		context._gifRendering = true;
 	}
@@ -618,7 +122,7 @@
 
 
 /***/ },
-/* 3 */
+/* 2 */
 /***/ function(module, exports) {
 
 	var code = "(function(b){function a(b,d){if({}.hasOwnProperty.call(a.cache,b))return a.cache[b];var e=a.resolve(b);if(!e)throw new Error('Failed to resolve module '+b);var c={id:b,require:a,filename:b,exports:{},loaded:!1,parent:d,children:[]};d&&d.children.push(c);var f=b.slice(0,b.lastIndexOf('/')+1);return a.cache[b]=c.exports,e.call(c.exports,c,c.exports,f,b),c.loaded=!0,a.cache[b]=c.exports}a.modules={},a.cache={},a.resolve=function(b){return{}.hasOwnProperty.call(a.modules,b)?a.modules[b]:void 0},a.define=function(b,c){a.modules[b]=c},a.define('/gif.worker.coffee',function(d,e,f,g){var b,c;b=a('/GIFEncoder.js',d),c=function(a){var c,e,d,f;return c=new b(a.width,a.height),a.index===0?c.writeHeader():c.firstFrame=!1,c.setTransparent(a.transparent),c.setRepeat(a.repeat),c.setDelay(a.delay),c.setQuality(a.quality),c.addFrame(a.data),a.last&&c.finish(),d=c.stream(),a.data=d.pages,a.cursor=d.cursor,a.pageSize=d.constructor.pageSize,a.canTransfer?(f=function(c){for(var b=0,d=a.data.length;b<d;++b)e=a.data[b],c.push(e.buffer);return c}.call(this,[]),self.postMessage(a,f)):self.postMessage(a)},self.onmessage=function(a){return c(a.data)}}),a.define('/GIFEncoder.js',function(e,h,i,j){function c(){this.page=-1,this.pages=[],this.newPage()}function b(a,b){this.width=~~a,this.height=~~b,this.transparent=null,this.transIndex=0,this.repeat=-1,this.delay=0,this.image=null,this.pixels=null,this.indexedPixels=null,this.colorDepth=null,this.colorTab=null,this.usedEntry=new Array,this.palSize=7,this.dispose=-1,this.firstFrame=!0,this.sample=10,this.out=new c}var f=a('/TypedNeuQuant.js',e),g=a('/LZWEncoder.js',e);c.pageSize=4096,c.charMap={};for(var d=0;d<256;d++)c.charMap[d]=String.fromCharCode(d);c.prototype.newPage=function(){this.pages[++this.page]=new Uint8Array(c.pageSize),this.cursor=0},c.prototype.getData=function(){var d='';for(var a=0;a<this.pages.length;a++)for(var b=0;b<c.pageSize;b++)d+=c.charMap[this.pages[a][b]];return d},c.prototype.writeByte=function(a){this.cursor>=c.pageSize&&this.newPage(),this.pages[this.page][this.cursor++]=a},c.prototype.writeUTFBytes=function(b){for(var c=b.length,a=0;a<c;a++)this.writeByte(b.charCodeAt(a))},c.prototype.writeBytes=function(b,d,e){for(var c=e||b.length,a=d||0;a<c;a++)this.writeByte(b[a])},b.prototype.setDelay=function(a){this.delay=Math.round(a/10)},b.prototype.setFrameRate=function(a){this.delay=Math.round(100/a)},b.prototype.setDispose=function(a){a>=0&&(this.dispose=a)},b.prototype.setRepeat=function(a){this.repeat=a},b.prototype.setTransparent=function(a){this.transparent=a},b.prototype.addFrame=function(a){this.image=a,this.getImagePixels(),this.analyzePixels(),this.firstFrame&&(this.writeLSD(),this.writePalette(),this.repeat>=0&&this.writeNetscapeExt()),this.writeGraphicCtrlExt(),this.writeImageDesc(),this.firstFrame||this.writePalette(),this.writePixels(),this.firstFrame=!1},b.prototype.finish=function(){this.out.writeByte(59)},b.prototype.setQuality=function(a){a<1&&(a=1),this.sample=a},b.prototype.writeHeader=function(){this.out.writeUTFBytes('GIF89a')},b.prototype.analyzePixels=function(){var g=this.pixels.length,d=g/3;this.indexedPixels=new Uint8Array(d);var a=new f(this.pixels,this.sample);a.buildColormap(),this.colorTab=a.getColormap();var b=0;for(var c=0;c<d;c++){var e=a.lookupRGB(this.pixels[b++]&255,this.pixels[b++]&255,this.pixels[b++]&255);this.usedEntry[e]=!0,this.indexedPixels[c]=e}this.pixels=null,this.colorDepth=8,this.palSize=7,this.transparent!==null&&(this.transIndex=this.findClosest(this.transparent))},b.prototype.findClosest=function(e){if(this.colorTab===null)return-1;var k=(e&16711680)>>16,l=(e&65280)>>8,m=e&255,c=0,d=16777216,j=this.colorTab.length;for(var a=0;a<j;){var f=k-(this.colorTab[a++]&255),g=l-(this.colorTab[a++]&255),h=m-(this.colorTab[a]&255),i=f*f+g*g+h*h,b=parseInt(a/3);this.usedEntry[b]&&i<d&&(d=i,c=b),a++}return c},b.prototype.getImagePixels=function(){var a=this.width,g=this.height;this.pixels=new Uint8Array(a*g*3);var b=this.image,c=0;for(var d=0;d<g;d++)for(var e=0;e<a;e++){var f=d*a*4+e*4;this.pixels[c++]=b[f],this.pixels[c++]=b[f+1],this.pixels[c++]=b[f+2]}},b.prototype.writeGraphicCtrlExt=function(){this.out.writeByte(33),this.out.writeByte(249),this.out.writeByte(4);var b,a;this.transparent===null?(b=0,a=0):(b=1,a=2),this.dispose>=0&&(a=dispose&7),a<<=2,this.out.writeByte(0|a|0|b),this.writeShort(this.delay),this.out.writeByte(this.transIndex),this.out.writeByte(0)},b.prototype.writeImageDesc=function(){this.out.writeByte(44),this.writeShort(0),this.writeShort(0),this.writeShort(this.width),this.writeShort(this.height),this.firstFrame?this.out.writeByte(0):this.out.writeByte(128|this.palSize)},b.prototype.writeLSD=function(){this.writeShort(this.width),this.writeShort(this.height),this.out.writeByte(240|this.palSize),this.out.writeByte(0),this.out.writeByte(0)},b.prototype.writeNetscapeExt=function(){this.out.writeByte(33),this.out.writeByte(255),this.out.writeByte(11),this.out.writeUTFBytes('NETSCAPE2.0'),this.out.writeByte(3),this.out.writeByte(1),this.writeShort(this.repeat),this.out.writeByte(0)},b.prototype.writePalette=function(){this.out.writeBytes(this.colorTab);var b=768-this.colorTab.length;for(var a=0;a<b;a++)this.out.writeByte(0)},b.prototype.writeShort=function(a){this.out.writeByte(a&255),this.out.writeByte(a>>8&255)},b.prototype.writePixels=function(){var a=new g(this.width,this.height,this.indexedPixels,this.colorDepth);a.encode(this.out)},b.prototype.stream=function(){return this.out},e.exports=b}),a.define('/LZWEncoder.js',function(e,g,h,i){function f(y,D,C,B){function w(a,b){r[f++]=a,f>=254&&t(b)}function x(b){u(a),k=i+2,j=!0,l(i,b)}function u(b){for(var a=0;a<b;++a)h[a]=-1}function A(z,r){var g,t,d,e,y,w,s;for(q=z,j=!1,n_bits=q,m=p(n_bits),i=1<<z-1,o=i+1,k=i+2,f=0,e=v(),s=0,g=a;g<65536;g*=2)++s;s=8-s,w=a,u(w),l(i,r);a:while((t=v())!=c){if(g=(t<<b)+e,d=t<<s^e,h[d]===g){e=n[d];continue}if(h[d]>=0){y=w-d,d===0&&(y=1);do if((d-=y)<0&&(d+=w),h[d]===g){e=n[d];continue a}while(h[d]>=0)}l(e,r),e=t,k<1<<b?(n[d]=k++,h[d]=g):x(r)}l(e,r),l(o,r)}function z(a){a.writeByte(s),remaining=y*D,curPixel=0,A(s+1,a),a.writeByte(0)}function t(a){f>0&&(a.writeByte(f),a.writeBytes(r,0,f),f=0)}function p(a){return(1<<a)-1}function v(){if(remaining===0)return c;--remaining;var a=C[curPixel++];return a&255}function l(a,c){g&=d[e],e>0?g|=a<<e:g=a,e+=n_bits;while(e>=8)w(g&255,c),g>>=8,e-=8;if((k>m||j)&&(j?(m=p(n_bits=q),j=!1):(++n_bits,n_bits==b?m=1<<b:m=p(n_bits))),a==o){while(e>0)w(g&255,c),g>>=8,e-=8;t(c)}}var s=Math.max(2,B),r=new Uint8Array(256),h=new Int32Array(a),n=new Int32Array(a),g,e=0,f,k=0,m,j=!1,q,i,o;this.encode=z}var c=-1,b=12,a=5003,d=[0,1,3,7,15,31,63,127,255,511,1023,2047,4095,8191,16383,32767,65535];e.exports=f}),a.define('/TypedNeuQuant.js',function(A,F,E,D){function C(A,B){function I(){o=[],q=new Int32Array(256),t=new Int32Array(a),y=new Int32Array(a),z=new Int32Array(a>>3);var c,d;for(c=0;c<a;c++)d=(c<<b+8)/a,o[c]=new Float64Array([d,d,d,0]),y[c]=e/a,t[c]=0}function J(){for(var c=0;c<a;c++)o[c][0]>>=b,o[c][1]>>=b,o[c][2]>>=b,o[c][3]=c}function K(b,a,c,e,f){o[a][0]-=b*(o[a][0]-c)/d,o[a][1]-=b*(o[a][1]-e)/d,o[a][2]-=b*(o[a][2]-f)/d}function L(j,e,n,l,k){var h=Math.abs(e-j),i=Math.min(e+j,a),g=e+1,f=e-1,m=1,b,d;while(g<i||f>h)d=z[m++],g<i&&(b=o[g++],b[0]-=d*(b[0]-n)/c,b[1]-=d*(b[1]-l)/c,b[2]-=d*(b[2]-k)/c),f>h&&(b=o[f--],b[0]-=d*(b[0]-n)/c,b[1]-=d*(b[1]-l)/c,b[2]-=d*(b[2]-k)/c)}function C(p,s,q){var h=2147483647,k=h,d=-1,m=d,c,j,e,n,l;for(c=0;c<a;c++)j=o[c],e=Math.abs(j[0]-p)+Math.abs(j[1]-s)+Math.abs(j[2]-q),e<h&&(h=e,d=c),n=e-(t[c]>>i-b),n<k&&(k=n,m=c),l=y[c]>>g,y[c]-=l,t[c]+=l<<f;return y[d]+=x,t[d]-=r,m}function D(){var d,b,e,c,h,g,f=0,i=0;for(d=0;d<a;d++){for(e=o[d],h=d,g=e[1],b=d+1;b<a;b++)c=o[b],c[1]<g&&(h=b,g=c[1]);if(c=o[h],d!=h&&(b=c[0],c[0]=e[0],e[0]=b,b=c[1],c[1]=e[1],e[1]=b,b=c[2],c[2]=e[2],e[2]=b,b=c[3],c[3]=e[3],e[3]=b),g!=f){for(q[f]=i+d>>1,b=f+1;b<g;b++)q[b]=d;f=g,i=d}}for(q[f]=i+n>>1,b=f+1;b<256;b++)q[b]=n}function E(j,i,k){var b,d,c,e=1e3,h=-1,f=q[i],g=f-1;while(f<a||g>=0)f<a&&(d=o[f],c=d[1]-i,c>=e?f=a:(f++,c<0&&(c=-c),b=d[0]-j,b<0&&(b=-b),c+=b,c<e&&(b=d[2]-k,b<0&&(b=-b),c+=b,c<e&&(e=c,h=d[3])))),g>=0&&(d=o[g],c=i-d[1],c>=e?g=-1:(g--,c<0&&(c=-c),b=d[0]-j,b<0&&(b=-b),c+=b,c<e&&(b=d[2]-k,b<0&&(b=-b),c+=b,c<e&&(e=c,h=d[3]))));return h}function F(){var c,f=A.length,D=30+(B-1)/3,y=f/(3*B),q=~~(y/w),n=d,o=u,a=o>>h;for(a<=1&&(a=0),c=0;c<a;c++)z[c]=n*((a*a-c*c)*m/(a*a));var i;f<s?(B=1,i=3):f%l!==0?i=3*l:f%k!==0?i=3*k:f%p!==0?i=3*p:i=3*j;var r,t,x,e,g=0;c=0;while(c<y)if(r=(A[g]&255)<<b,t=(A[g+1]&255)<<b,x=(A[g+2]&255)<<b,e=C(r,t,x),K(n,e,r,t,x),a!==0&&L(a,e,r,t,x),g+=i,g>=f&&(g-=f),c++,q===0&&(q=1),c%q===0)for(n-=n/D,o-=o/v,a=o>>h,a<=1&&(a=0),e=0;e<a;e++)z[e]=n*((a*a-e*e)*m/(a*a))}function G(){I(),F(),J(),D()}function H(){var b=[],g=[];for(var c=0;c<a;c++)g[o[c][3]]=c;var d=0;for(var e=0;e<a;e++){var f=g[e];b[d++]=o[f][0],b[d++]=o[f][1],b[d++]=o[f][2]}return b}var o,q,t,y,z;this.buildColormap=G,this.getColormap=H,this.lookupRGB=E}var w=100,a=256,n=a-1,b=4,i=16,e=1<<i,f=10,B=1<<f,g=10,x=e>>g,r=e<<f-g,z=a>>3,h=6,t=1<<h,u=z*t,v=30,o=10,d=1<<o,q=8,m=1<<q,y=o+q,c=1<<y,l=499,k=491,p=487,j=503,s=3*j;A.exports=C}),a('/gif.worker.coffee')}.call(this,this))";
@@ -642,19 +146,21 @@
 
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
-	var dat = __webpack_require__(5);
+	var dat = __webpack_require__(4);
 
 	p5.prototype.createGUI = function(params) {
-		return new dat.GUI(params);
+		var context = this._isGlobal ? window : this;
+		context.gui = new dat.GUI(params);
+		return context.gui;
 	}
 
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports) {
 
 	/**
@@ -2243,9 +1749,6 @@
 
 	    var _this = this;
 
-	    this.minHeight = null;
-	    this.maxHeight = null;
-
 	    /**
 	     * Outermost DOM Element
 	     * @type DOMElement
@@ -2657,6 +2160,48 @@
 	      {
 
 	        /**
+	         * @param property
+	         * @param value
+	         * @returns {dat.controllers.Controller} The new controller that was added.
+	         * @instance
+	         */
+	        def: function(property, value) {
+
+	          window[property] = value;
+
+	          return add(
+	              this,
+	              window,
+	              property,
+	              {
+	                factoryArgs: Array.prototype.slice.call(arguments, 2)
+	              }
+	          );
+
+	        },
+	        
+	        /**
+	         * @param property
+	         * @param value
+	         * @returns {dat.controllers.Controller} The new controller that was added.
+	         * @instance
+	         */
+	        defColor: function(property, value) {
+
+	          window[property] = value;
+
+	          return add(
+	              this,
+	              window,
+	              property,
+	              {
+	                color: true
+	              }
+	          );
+
+	        },
+
+	        /**
 	         * @param object
 	         * @param property
 	         * @returns {dat.controllers.Controller} The new controller that was added.
@@ -2772,42 +2317,23 @@
 	          this.closed = true;
 	        },
 
-	        setMinHeight: function(h) {
-	          this.minHeight = h;
-	          this.onResize();
-	        },
-
-	        setMaxHeight: function(h) {
-	          this.maxHeight = h;
-	          this.onResize();
-	        },
-
-	        setParent: function(id) {
-	          var e;
-	          if(this.autoPlace) e = this.domElement.parentNode;
-	          else e = this.domElement;
-	          document.getElementById(id).appendChild(e);
-	        },
-
 	        onResize: function() {
 
 	          var root = this.getRoot();
 
 	          if (root.scrollable) {
 
+	            var top = dom.getOffset(root.__ul).top;
 	            var h = 0;
-	            var minHeight = this.minHeight || 0;
-	            var maxHeight = this.maxHeight || window.innerHeight;
-	            var closeButtonHeight = dom.getHeight(root.__closeButton);
 
 	            common.each(root.__ul.childNodes, function(node) {
 	              if (! (root.autoPlace && node === root.__save_row))
 	                h += dom.getHeight(node);
 	            });
 
-	            if (Math.max(minHeight, maxHeight) - closeButtonHeight < h) {
+	            if (window.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
 	              dom.addClass(root.domElement, GUI.CLASS_TOO_TALL);
-	              root.__ul.style.height = Math.max(minHeight, maxHeight) - closeButtonHeight + 'px';
+	              root.__ul.style.height = window.innerHeight - top - CLOSE_BUTTON_HEIGHT + 'px';
 	            } else {
 	              dom.removeClass(root.domElement, GUI.CLASS_TOO_TALL);
 	              root.__ul.style.height = 'auto';
@@ -2975,16 +2501,8 @@
 
 	  function add(gui, object, property, params) {
 
-	    // Assume global mode, attach property to window
-	    if(typeof object !== "object") {
-	      var val = property;
-	      property = object;
-	      object = window;
-	    }
-
 	    if (object[property] === undefined) {
-	      if(object === window && val !== undefined) object[property] = val;
-	      else throw new Error("Object " + object + " has no property \"" + property + "\"");
+	      throw new Error("Object " + object + " has no property \"" + property + "\"");
 	    }
 
 	    var controller;
@@ -4365,6 +3883,277 @@
 	module.exports = dat;
 
 /***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	p5.prototype.toggleLoop = function() {
+		if(this._loop) this.noLoop();
+		else this.loop();
+	}
+
+	p5.prototype.isLooping = function() {
+		return this._loop;
+	}
+
+	/**
+	 * Allows to bind a function to a p5 method.
+	 * @param 	{Function} 	name 	of a method attached to this p5 instance
+	 * @param 	{string} 	when 	the function should fire ("pre" or "post")
+	 * @param 	{Function} 	fn 		function to be called
+	 * @example
+	 * // Global mode
+	 * registerInstanceMethod("rect", "pre", function() {
+	 *     clear();
+	 * });
+	 * // The canvas will now be cleared before every rect() call
+	 */
+	p5.prototype.registerInstanceMethod = function(name, when, fn) {
+		if(when === undefined || !(when == "pre" || when == "post")) {
+			when = "post";
+		}
+		if(!this.hasOwnProperty("_registeredInstanceMethods")) {
+			this._registeredInstanceMethods = {};
+		}
+		if(!this._registeredInstanceMethods.hasOwnProperty(name)) {
+			this._registeredInstanceMethods[name] = {};
+		}
+		if(!this._registeredInstanceMethods[name].hasOwnProperty(when)) {
+			this._registeredInstanceMethods[name][when] = [];
+			var _method = this[name];
+			if(when == "pre") {
+				this[name] = function() {
+					this._registeredInstanceMethods[name]["pre"].forEach(function(f) {
+						if(typeof(f) === "function") {
+							f.call(this);
+						}
+					}, this);
+					return _method.apply(this, arguments);
+				};
+			}
+			else {
+				this[name] = function() {
+					var r = _method.apply(this, arguments);
+					this._registeredInstanceMethods[name]["post"].forEach(function(f) {
+						if(typeof(f) === "function") {
+							f.call(this);
+						}
+					}, this);
+					return r;
+				}
+			}
+		}
+		this._registeredInstanceMethods[name][when].push(fn);
+	};
+
+	//
+	p5.prototype.createToy = function(parent) {
+		var context = this._isGlobal ? window : this;
+
+		if(parent && typeof parent === "string") {
+			parent = document.querySelector(parent);
+		}
+		if(!parent) parent = context._curElement.parent();
+
+		__webpack_require__(6);
+		var h = __webpack_require__(10);
+		var d = document.createElement("div");
+		d.innerHTML = h;
+		var root = d.childNodes[0];
+		var cvs = root.querySelector(".p5toy-canvas"),
+			menu = root.querySelector(".p5toy-menu");
+		parent.appendChild(root);
+		context._curElement.parent(cvs);
+
+		var	buttons = root.querySelector(".p5toy-buttons"),
+			playBtn = root.querySelector(".p5toy-play"),
+			snapBtn = root.querySelector(".p5toy-snapshot"),
+			pngBtn = root.querySelector(".p5toy-png"),
+			recordBtn = root.querySelector(".p5toy-record"),
+			recordProgress1 = root.querySelector(".p5toy-record-progress-1"),
+			recordProgress2 = root.querySelector(".p5toy-record-progress-2"),
+			gifBtn = root.querySelector(".p5toy-gif"),
+			closeBtn = root.querySelector(".p5toy-close");
+
+		var gui = context.createGUI({scrollable: false, autoPlace: false});
+		menu.appendChild(gui.domElement);
+
+		context._buttonSize = 60;
+
+		var onResize = function() {
+			if(this._setupDone) context.resizeCanvas(context.width, context.height);
+			cvs.style.minHeight = cvs.style.minWidth = 4*context._buttonSize + "px";
+			gui.domElement.style.maxWidth = 4*context._buttonSize + "px";
+			gui.domElement.style.minHeight = 240 - buttons.offsetHeight + "px";
+			gui.domElement.style.maxHeight = Math.max(4*context._buttonSize, context.height) - buttons.offsetHeight + "px";
+		}.bind(this);
+		onResize();
+
+		// Spacebar pressed while toy is focused
+		root.addEventListener("keydown", function(e) {
+			if(!e.ctrlKey && e.which == 32) {
+				context.toggleLoop();
+				e.preventDefault();
+				//e.stopPropagation();
+			}
+		});
+
+		// Spacebar pressed (will toggle all instances)
+		window.addEventListener("keydown", function(e) {
+			if(e.ctrlKey && e.which == 32) {
+				context.toggleLoop();
+				e.preventDefault();
+			}
+		});	
+
+		playBtn.addEventListener("click", function() {					// Play/Pause
+			if(context.isLooping()) {
+				context.pauseButton();
+			}
+			else {
+				context.playButton();
+			}
+		});
+
+		// Using those callbacks so that the buttons
+		// stay in the correct state when loop/noLoop
+		// are called without the buttons being clicked
+		this.registerInstanceMethod("noLoop", "post", function() {
+			playBtn.classList.add("paused");
+		});
+
+		this.registerInstanceMethod("loop", "post", function() {
+			playBtn.classList.remove("paused");
+		});
+
+		snapBtn.addEventListener("click", function() {					// Snapshot
+			snapBtn.classList.add("download");
+			var dataUri = context._curElement.elt.toDataURL("image/png");
+			pngBtn.setAttribute("href", dataUri);
+		});
+
+		pngBtn.addEventListener("click", function(e) {
+			snapBtn.classList.remove("download");
+			e.stopPropagation();
+		});
+
+		recordBtn.addEventListener("click", function() {				// Record gif
+			if(context._gif) {
+				if(context._gifRendering) {
+					context.abortGif();
+				}
+				else {
+					context.stopRecordButton();
+				}
+			}
+			else {
+				context.recordButton();
+			}
+		});
+
+		// Same reason as for the play/pause button
+		this.registerInstanceMethod("abortGif", "post", function() {
+			recordProgress1.style.width = 0;
+			recordProgress1.style.marginTop = 0;
+			recordProgress2.style.height = 0;
+			recordBtn.classList.remove("recording");
+			recordBtn.classList.remove("download");
+		});
+
+		this.registerInstanceMethod("startGif", "post", function() {
+			recordBtn.classList.remove("download");
+			recordBtn.classList.add("recording");
+			context._gif.on("progress", function(p) {
+				recordProgress1.style.width = ((p*5)%1)*100 + "%";
+				recordProgress1.style.marginTop = Math.floor(p*5)*20 + "%";
+				recordProgress2.style.height = Math.floor(p*5)*20 + "%";
+			});
+			context._gif.removeListener("finished", context._gifDefaultFinishedCallback);
+			context._gif.on("finished", function(blob) {
+				recordBtn.classList.add("download");
+				recordProgress2.style.height = null;
+				gifBtn.setAttribute("href", URL.createObjectURL(blob));
+			});
+		});
+
+		gifBtn.addEventListener("click", function(e) {
+			recordBtn.classList.remove("recording");
+			recordBtn.classList.remove("download");
+			e.stopPropagation();
+		});
+
+		closeBtn.addEventListener("click", function() {					// Collapse/Expand
+			if(root.classList.contains("side")) {
+				context.collapseButton();
+			}
+			else {
+				context.expandButton();
+			}
+		});	
+
+		// Adding new methods to the instance/window
+		context.playButton = context.loop;
+		context.pauseButton = context.noLoop;
+		context.recordButton = context.startGif;
+		context.stopRecordButton = context.stopGif;
+		context.expandToy = function() {
+			root.classList.add("side");
+			root.classList.remove("overlay");
+		};
+		context.collapseToy = function() {
+			root.classList.add("overlay");
+			root.classList.remove("side");
+		};
+		context.collapseButton = context.collapseToy;
+		context.expandButton = context.expandToy;
+		context.hideGUI = function() {
+			root.classList.add("noGUI");
+			onResize();
+		};
+		context.showGUI = function() {
+			root.classList.remove("noGUI");
+			onResize();
+		};
+		context.hideButtons = function() {
+			root.classList.add("noButtons");
+			onResize();
+		};
+		context.showButtons = function() {
+			root.classList.remove("noButtons");
+			onResize();
+		};
+		context.addDefaultParams = function() {
+			var globalParams = gui.addFolder("Global settings");
+			globalParams.add(context, "width").listen().onChange(onResize).min(0).step(5).name("Canvas width");
+			globalParams.add(context, "height").listen().onChange(onResize).min(0).step(5).name("Canvas height");
+			context.targetFPS = 60;
+			globalParams.add(context, "targetFPS").listen().min(0).max(60).step(1).name("Target framerate").onChange(function() {
+				context.frameRate(context.targetFPS);
+			});
+
+			var gifParams = gui.addFolder("Gif settings");
+			gifParams.add(context, "gifFps").listen().min(0).max(60).step(1).name("Framerate");
+			gifParams.add(context, "gifQuality").listen().min(0).max(1000).step(1).name("Quality (0=best)");
+			gifParams.add(context, "gifWorkers").listen().min(1).max(5).step(1).name("Workers");
+		};
+		context.buttonSize = function(v) {
+			if(v) {
+				context._buttonSize = v;
+				for(var b, i=0; i < buttons.children.length; i++) {
+					b = buttons.children[i];
+					b.style.width = b.style.height = v + "px";
+				}
+				onResize();
+				return context;
+			}
+			else return context._buttonSize;
+		};
+
+		context.gui = gui;
+
+	};
+
+/***/ },
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -4380,8 +4169,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../node_modules/css-loader/index.js!./toy.css", function() {
-				var newContent = require("!!./../node_modules/css-loader/index.js!./toy.css");
+			module.hot.accept("!!./../node_modules/css-loader/index.js!./../node_modules/postcss-loader/index.js!./toy.css", function() {
+				var newContent = require("!!./../node_modules/css-loader/index.js!./../node_modules/postcss-loader/index.js!./toy.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -4399,7 +4188,7 @@
 
 
 	// module
-	exports.push([module.id, "\n#p5toy-container {\n\tdisplay: flex;\n\tflex-wrap: nowrap;\n}\n\n#p5toy-container > div {\n\tbox-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);\n}\n\n#p5toy-mainbox {\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n\tbackground: repeating-linear-gradient(-45deg, #ededed, #ededed 10px, #f5f5f5 10px, #f5f5f5 20px );\n\tmin-width: 280px;\n\tposition: relative;\n}\n\n#p5toy-open {\n\tposition: absolute;\n\ttop: 0;\n\tright: 0;\n\tmargin: 8px;\n\twidth: 52px;\n\theight: 52px;\n\topacity: 0;\n\tbackground: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAADGElEQVRoQ+1Z7XXUMBDcqQA6IKkAUgGkAqACQgWECggVECogVABUQFIBoQKSDqCC4Q1PvuezLe3KliH3uP2TH5FXO/s5q4PtuGDH7bc9gH8dwaYRIPnNzB45oK4BHLUC3hoAI4YBaHZvM0Ukn5jZ1wgAMzsGcBk8Wzy2B9C5h+SZmb0JevU1gPPg2b8WgRoAbwHo/GJxU6iX29dmdg7gY/9WkgfJ88/M7H7QohszOxvq0rckn5rZaepmRwB0NisRAMPW+NPMLszsvZm9SJdFDR8aIuNeqqBJSpeiIod0cgngeDYAkidm9iHo1SXH5JScE4odKxsBklL4oyItlgAofXsD4DB3oASgpijXMr7Tm+1akwBSYcr7d0WUYocA9HdLcgA+mZm6yhy5VbcyMxWgOpc6i/iRJrW6y4M5StU0AOj7MoBKSjDU5w4okjLi3UwQisJWWx1FgKQ8rwjUinr2H497ssBJarlq4RvJpZBC/rki3K7nh6AqI/HLzE4AyCa/BlLeqo0KrSZjSW4B9IePF4DN/0kqHbyauErGT07kyCT2crba+x2CQBRczuQCSNEobVrh3J9II6WqdE9JcYB1H0QBZDetpdsVyUW6/xsApWJbK4W+A/AeCPx3IZLaskrLx5pFfApAtD0rJTKn1qiB5nkhVGxTFpAU3/JasHq/BtiIB0lnbpBpD9C4jy4q1VEItNA+ZqXw86lJP0Ul5i4x4VpYQFdCXEghnUul3Zwl+Sqx1fDE7h0cOSmXQqLDumiOKNz6/mpApx8nOu3lfO7OLwBGFD8HQLkvQ+7NQbDSN6P0yRZxog8eB1rJzkm1WU5UnMRBtrg2EFHpg6o22mOLpQdbKW6VYiVdoyWm7zGXC5HUK7IKsBPtvHpVu0iblXYGj9PnoiRdWlT0sKX2rYnf1+XSiQgAdQ2tit3T4mgrylxeSq2NE4aH0oxQ/clp7jO8CyCa4JWv0+6iEr23JYCarlVNPXKAWgLY/0ITTZuqLlSjtLQebl16F3/kS9NbneqhA9ptjTVOa1YDNZe2PLsH0NKbc3TtfAR+A36aTECwLSqWAAAAAElFTkSuQmCC);\n\ttransition: 150ms;\n\tmix-blend-mode: exclusion;\n\tz-index: 15;\n}\n#p5toy-mainbox.p5toy-sbHidden:hover > #p5toy-open {\n\topacity: 0.7;\n}\n#p5toy-mainbox.p5toy-sbHidden:hover > #p5toy-open:hover {\n\tcursor: pointer;\n\topacity: 1;\n}\n\n#p5toy-sidebox {\n\tmargin-left: 20px;\n\tbackground: #fff;\n\toverflow: hidden;\n\ttransition: 150ms ease-in;\n\twidth: 240px;\n}\n\n#p5toy-sidebox.p5toy-sbHidden {\n\twidth: 0;\n\tmargin-left: 0;\n}\n\n#p5toy-controls {\n\tdisplay: inline-flex;\n\toverflow: hidden;\n}\n\n#p5toy-controls > div {\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n\twidth: 60px;\n\theight: 60px;\n\tcursor: pointer;\n\tposition: relative;\n}\n\n#p5toy-play {\n\tbackground: #6eb3ee;\n}\n\n#p5toy-snapshot {\n\tbackground: #eed56e;\n}\n\n#p5toy-record {\n\tbackground: #cd5c5c;\n}\n\n#p5toy-close {\n\tbackground: #424242;\n}\n\n.p5toy-snapshot-button {\n    width: 100%;\n    height: 100%;\n    top: 0;\n    left: 0;\n    background-repeat: no-repeat;\n    background-size: 48px;\n    background-position: 45% 60%;\n    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAFT0lEQVR4Xu2c8VXUQBDGZypQK1AqECoQOtAKlAqECtQKhAqECsAKhAqECoQKhArG98EGjyPZneR2M7vH5D3+IblM8v1mdjczkzD5ZqoAm1p34+QAjJ3AATgAYwWMzXsEOABjBYzNewQ4gP8KiMgnIvpRWJMjZt4tbEN9+moiYCbxO2GqgVAFgJnFrwqCOQAj8auBYArAWPwqIJgBqER8cwgmACoT3xTC7AAqFd8MwmgAIvKGiD4T0TYRbaoXvOt94AURnRHRITNfjbnVUQBE5DsR7Y0x8AyPPWDmfe19qwGIyG/3eK2sdMbMO5qjVQBE5CAMO5pz+jH3CmA4So4WSQBhzP/jqk5SYCM1J2gAuPdP0l4XBRoAPvZPB3DBzFuxn2sAyHT7/ktmjmrsAAr7iAMoLHDq9A4gpVDh/Q6gsMCp068TgPOQb0HO5YaZkX952EQEeamXIUeFPNW7lDhz7G8dwDURfSWiU2a+GSOYiAAGivx4Gn095rc5j20VwJ3wzHyUQ4yQAgfI2UG0COAwiD/K41OgQkQAAlLps20tAbjFkMHMpyXVEZH3RITIelHSTnfuVgBA/O3libWUQGHCxmReHEILANTiB+E+hroEJtmuIocVEYYsiPpTA3IuCC0A+JAadkQEomP8RjlUs6EsiEn8OHZwGI5ONCecekztAKJFi1CLQK8o1vVTNkTEbiwnX7rYVDMALDU3h9b3IgLR4Z0YalbZMDTtDA1LYXWEIazIErVmAPDM3nV+EP/XKqr3/HYrAqFYV3atAK6ZuXc8D8MOikCrev4yA0QCIPS2jYgI/p89CmoFEPN+eP7UMT8VNIPdCiKClAXabrJutQJ41Tf2z9Q117vqCnPB36zqE1GNAM6ZudfDRQTdF9ql5lStrph5o+/HIoJVU9Ysao0AvjEz1vSPtvBghLF/jq13QhYRXNeXnBdQIwAsCeFpywDmbH8ZcgJEZtbVV40Ahrwve/hHPLl3GCwRhdUBGLqgmXtPB/t1RCRrG05LALLeeGocjzhC1utwAAMkHMDTSRj5mLcpz820/5KZe18uWfshKKQDHnU0QNQSa3CfhPsVqHkZinJl1vpAdXMAEfmD2IJjWjTnxlIRRTKSS4EYy8RmfxapMQKghyfjgldYRABM7zMzUg9PtsKTcSz6nlU6OpaRRDYUq6TcLSPovkAJdKggUyQTW+sQBM/3kiTqBakHm9wPJgv24IlIzPW2IIa6MLrkVo2EaN9RKMQgDV6kDlFzBICFpi0FhfupRRK0tKPdcfDzAc+5LaULBk1jFroWxnQ3o+VlT9Hwlf3Ba3lEqT0CcL3Rvp3FGwr5eoiGwgm6Jrrc0eVCayLeJXiS6ugpACEXhOJL7u6LR6ZaADAKQmrO0uwPIIuLj2tpBUAHASujOdrT0e5Y1PM7R2gJQHfNeEBDvqjECxoouCc/oKGJIu0xLQLAvam6m7UiTOiu1p46eVyrALobAwhExPHYiAjre7S1w+OLrPGT6jc2B6TuB5nK7u924DVVPLRhhdT9pc5ZfH/rEVBcoNIGHEBphRPndwAOwFgBY/MeAWsAYM5+HWO5spsf7D96eFJOmSydrk3Zb3x/8tOVmoIMHmL8s5XTPGH1z1bCrkfBJPWT3n+XLdWeWkR8LtCKdf+5BNQtkpsagEdCUsvuAJXnqyfhZbPhPV4kuJBvmaubWX33RgeiIoc8Fb6cXu7z9UY3t9ZmRw1Ba62E0c05ACPhJ88Bxte7duY9AoyROgAHYKyAsXmPAAdgrICxeY8AB2CsgLF5jwAHYKyAsXmPAAdgrICxeY8AYwD/AAgzrH/GSVQUAAAAAElFTkSuQmCC);\n}\n\n#p5toy-png {\n\tvisibility: hidden;\n\twidth: 100%;\n\theight: 100%;\n\ttop: 0;\n\tleft: 0;\n\tbackground-repeat: no-repeat;\n\tbackground-size: 45px;\n\tbackground-position: center center;\n\tbackground-color: #eed56e;\n\tbackground-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAFd0lEQVR4Xu2c7XXVMAyGrQloJwAmgE5AOwFsQJkAmAA6Ae0ElAmACWgnoJ0ANqBMIM7bOj25vo4lx04drpVz7q8kdqJHryR/5JKzo6kFqGnv1rkzAI2dwAAYgMYWaNy9KcAANLZA4+5NAbsGgJmfOOfeOucOnXPPG79fre6vnHMXzrkzIvpdq1G0U1UBzPzJOfeu5gOusK1TInpf67mqAWDmnzvk8ZJ9r4joQLpIc74KAGY+9WFH0+euXINwVKz2YgA+5v/aFatmvsfT0pxQA0CP3j9wKlZBDQA9xf5QIMW5oAYAzpTtTl1OREU2LLoZlmTmJIDSB2xNa+n3MwACYQPQWAIGwACkLbC0hzS2/+I5znKA5YDWPt5W4aYAU4ApoMgCloRtJFzkQNLNSzuY5QDLAZIPtj1vCmhrfxuINba/ATAAgQV2dN9PKefZ+4ayqqBO9v2UwsjaN6QG0Nm+n1II6rViFYBO9/2UQlDtmBABdL7vpxSCuG9IA6DnfT+lAEQVaAD0vO+nFICYCzQAut73U0pA2pazBIAjxUPjuwF8P/BScW3YHr4/+Dxx3xfn3Hlw7ofQx3d/zw0R4RsAjH7RB36v/O+x4jmjlzw4AKnD8VMy855/+UkQsfaYGYZ6EXnjEyL6GPQxpeBr59wxEWEQlTyYGW1+kK6LnZfsUV0BUoexh2RmeO1r7QswM9QT82wtABj/kIhutEZl5uOE8iabkeyxOAAv57GE/8a8jpnx6c+W1KdeYAKaFsBB+AzMjHADJ4AqvxHRWWjVhPJWDSAm363yjJnxsQM+cdo4EgAQo8PvEjQAvhARvPn+mPDucyJ6o7guKaI1KGAqfu6PQ8BUWEm9QEQFGgAx7//jPT805sZAas6gdM0Ajoaqw1ce0bguAAhVIAII20vkEzwWclP4VeRGkpdyyJoBzFIAvHD8WVCgAgnAJREB9Dj8zK5wJOPj/FoBxOKwKgd4jwWE23rfl7Lw0kfOOQMQkTgS3pD0UPahwggHSzAkEipCSjIJewAYiCGW35aRozq9BoATwbOzxgPNFaCRKTPDoBuVyXBfImbfG3ukAiyGpAZiYgiSDCbtkpAcaOu8ZKDaHQbxFzU3jI8aPHokAMD7UaWMVYCYawBSUL23YhoBRo96/fh+oWoJVYCpBUyfj5PseCpCVIBzbgwQuWqjCqrtkA8xEi6qMgQAoQr2wumFwGCYcNsPAE1Na+CyjVLZ55us2WEppP3vAGCTrcSbUABOxQZiAIkqKjwMgHLgNLn0FwkZsUoJ4fCrAYhYQAlga1wxNBUBsBG2RtchFGEsglL4tlzGSFgIaVINs9qBmPjgijI0bCOqgomkeUFEmoWjjT58AYF5I/XRQw4YjBFVQaJqwUIMYrxqTYCZMVWNCguls/roCQCMsqUCoWwch5rLIHnD0M9Gy5Jbo3QNhQcHoHmolV8DKFlennqfGgAgVXiCHfkWuCai5B8XasYBtjEr3/DDHVU2ZsWW/uY/Ul93lm9NhL1sc+4srxG9H62KIWjompktF+g5iLH/fpyjb9OUoLSVyvNnAfDhCDkBQ3YM3a06urMkNnphtx4WhLL+2lgdgqboS/PjUh2s9Kpmly39fgZAQGsAmvn+XccGwACkLbC0hzS2vynAADROUgbAACz618xWhjZ2MANgAFpH+bZVnilg1xWwbv8uf7rSua4aCuh5nUA97z+FugaAnteMs+b+YxBqAOh5zVhc85WCXDEAP2PYowqKvR+2qwLAQ+gpFxTH/kEZ1QB0pIQqnr8IAA9hF9eMZ6/5PkgOkDqx89MWqBqCzND5FjAA+TareocBqGrO/MYMQL7Nqt5hAKqaM78xA5Bvs6p3GICq5sxv7B9SK7WO60ToTAAAAABJRU5ErkJggg==);\n\tposition: absolute;\n\tz-index: 10;\n\topacity: 0;\n\ttransition: 250ms;\n}\n\n.p5toy-download #p5toy-png {\n\tvisibility: visible;\n\topacity: 1;\n}\n\n.p5toy-x-button {\n    position: relative;\n    width: 75%;\n    height: 75%;\n    transition: 50ms;\n}\n#p5toy-sidebox.p5toy-sbHidden .p5toy-x-button {\n\ttransform: rotate(-45deg);\n}\n\n.p5toy-bar {\n    background: white;\n    width: 16%;\n    height: 100%;\n    margin-left: 41%;\n}\n.p5toy-bar-1 {\n\ttransform: rotate(45deg);\n\tfloat: left;\n}\n.p5toy-bar-2 {\n\ttransform: rotate(-45deg);\n}\n\n.p5toy-record-button {\n\theight: 62%;\n\twidth: 62%;\n\tbackground: white;\n\tborder-radius: 50%;\n\tposition: relative;\n\ttransition: 0.25s ease;\n}\n\n.p5toy-recording .p5toy-record-button {\n\tborder-radius: 0;\n}\n\n.p5toy-recording .p5toy-record-progress-1, .p5toy-recording .p5toy-record-progress-2 {\n\tdisplay: block;\n}\n\n.p5toy-record-progress-1, .p5toy-record-progress-2 {\n\tbackground: #79c784;\n\tmargin-top: 0;\n\tdisplay: none;\n}\n\n.p5toy-record-progress-1 {\n\theight: 7.44px;\n\twidth: 0;\n\tfloat: left;\n}\n\n.p5toy-record-progress-2 {\n\theight: 0;\n\twidth: 37.2px;\n}\n\n.p5toy-download .p5toy-record-progress-2 {\n\ttransition: 250ms;\n\tmargin-left: -11px;\n\tmargin-top: -11px;\n\twidth: 60px;\n\theight: 60px;\n}\n\n#p5toy-blob {\n\tvisibility: hidden;\n\twidth: 100%;\n\theight: 100%;\n\ttop: 0;\n\tleft: 0;\n\tbackground-repeat: no-repeat;\n\tbackground-size: 45px;\n\tbackground-position: center center;\n\tbackground-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAFA0lEQVR4Xu2djXHUMBCFdysAKgAqgFRAUgGhAqACkgoIFZBUQFIBUAFJBSQVkHQQKljmMbqM4/Od9Xzrk3xezzBh5nT6eZ9WWkkrn0o8RRXQoqVH4RIACneCABAACitQuPiwgABQWIHCxYcF7DoAM9sXkfcigr8vCrfXq/hbEbkUkQtVxd/Bz2gWYGZPReR7En5wBSfwRQB4p6r3Q+o6CoAk/i8ReT2kUhP8zrWIHAyBMBYAiI8hZ07PpaoesA12B5DGfACY4wMroOaEMQCcp0l3jgAwKX9gGj4GgD875O0wWiLtraq+ZL40BgBjKrBraVWV0pRKnCOWma0FwFYwp8xtpvFuXwAg6QUAUjDv5AHAW1EyvwBACuadPAB4K0rmFwBIwbyTBwBvRcn8AgApmHfyAOCtKJlfACAF804eALwVJfMLAKRg3skDgLeiZH4BgBTMO3kA8FaUzK86AGaGWJ9P6RB+V6IgEOWAs90zVUUM0MNTFQAz+yoiR2QnmlryU1U9XlS6GgBm9ntGcT8PISdVADCz0zTsTK03b1JfDEdHxQGkMR+RD3N8EPGwtu3smTd9JjzT3r/obGd9lr8NAHMa+9tWDu9orae3DQCzjvvpG3drBnAnIj+Sf33fjqE0M/QshLQjqBf/x98njQZfqepSwG97UmQFaLiX8Pvf9Anc9zlb/pA5gLWAKxE5YYNWzawtSAAA/T43rNVDjlUVLiv9BIAVkhEAPqoqIqUfPcmNfZuGmcWVJdwuwQSHZT96+q0nADP7nNEDENW88RWqWoagzjBtYusCMDAfNAUZPAQRnSaD0/okNQD4C+Ha13XM7JuIULHzraYGgMw5YKn3O92aCQCZAJbGfjOD+4lxf5MnAGQC2FNVjOEPT8cYjDXB0gTdogOfv+mXbwKg794W1h3NNcfgjlJ8DuiqQAeATjFb0E5EpOm9DAbQp2aHx9X3lZWfBwDyilCyapdVMPIqDkBEnnV4QO3VM/z9R0OQqn4JC8gwvAyfeumurJlhTni1Lvt2zzEztyEoo84ZLc9LUoMFLG0/5JwhBIA8wDl7QdequtcaTrCqxbCz0tMIAH4AkFPXMARXD+uB511FBQBfACvfHmJm2I5ovzsIVvMovCXmgBVAiAlt8CtckmsYk3AXAwIAvo5t5iNVvcg0sObqOQA4AFhkgQkY4z/+3XS92CgdSWJ+wPB02LE3P3glTHYatq88Sl+DG7pRA6b+5W0A6F1UTV3ENfW/YReUfVoMOZSfY1jiQscqArNwTBihiSu69uhDUHIR52gFdQTnLsDnbLD1jX8T+vynqsIz692K2YoFNCDMwRL+9/xGm13fCEZPwu1em+J8UEH472u3nCfU4+Ht4JAGt2PqvaI0ZKHGmmht0PoWdWz7NraADotwNdEAQCrg3UPI4kdP7t2+sAASWQAgBfNOHgC8FSXzCwCkYN7JA4C3omR+AYAUzDt5APBWlMwvAJCCeScPAN6KkvlNHgDZ3sklr2EvCLuHndFvk1OTr/CdqlI3LcfYiogf8SHAjQEA5wLxM1aZENwBoFzPKz+Z7aghWe+1q65KjgUA4eg4UdqVE7I+wDhB26/mpwyTFQACQhE3fgNJX+sLf46XkRwOER/1HsUCmoKkS9qLkPRd8Y5wzRYWfs6+BabdWUYHULh3Vl98ACiMKAAEgMIKFC4+LCAAFFagcPFhAQGgsAKFi/8Ho2JJjqqRr/AAAAAASUVORK5CYII=);\n\tposition: absolute;\n\tz-index: 10;\n\topacity: 0;\n\ttransition: 250ms;\n}\n\n.p5toy-download #p5toy-blob {\n\tvisibility: visible;\n\topacity: 1;\n}\n\n\n/* https://codepen.io/aralon/pen/NqGWXZ */\n.p5toy-play-button {\n\theight: 62%;\n\twidth: 62%;\n\tposition: relative;\n}\n.p5toy-left {\n\theight: 100%;\n\tfloat: left;\n\tbackground-color: #fff;\n\twidth: 36%;\n\t-webkit-transition: all 0.25s ease;\n\ttransition: all 0.25s ease;\n\toverflow: hidden;\n}\n.p5toy-triangle-1 {\n\t-webkit-transform: translate(0, -100%);\n\ttransform: translate(0, -100%);\n}\n.p5toy-triangle-2 {\n\t-webkit-transform: translate(0, 100%);\n\ttransform: translate(0, 100%);\n}\n.p5toy-triangle-1,\n.p5toy-triangle-2 {\n\tposition: absolute;\n\ttop: 0;\n\tright: 0;\n\tbackground-color: transparent;\n\twidth: 0;\n\theight: 0;\n\tborder-right: 37.2px solid #6eb3ee;\n\tborder-top: 19px solid transparent;\n\tborder-bottom: 19px solid transparent;\n\t-webkit-transition: -webkit-transform 0.25s ease;\n\ttransition: -webkit-transform 0.25s ease;\n\ttransition: transform 0.25s ease;\n\ttransition: transform 0.25s ease, -webkit-transform 0.25s ease;\n}\n.p5toy-right {\n\theight: 100%;\n\tfloat: right;\n\twidth: 36%;\n\tbackground-color: #fff;\n\t-webkit-transition: all 0.25s ease;\n\ttransition: all 0.25s ease;\n}\n.p5toy-paused .p5toy-left {\n\twidth: 50%;\n}\n.p5toy-paused .p5toy-right {\n\twidth: 50%;\n}\n.p5toy-paused .p5toy-triangle-1 {\n\t-webkit-transform: translate(0, -50%);\n\ttransform: translate(0, -50%);\n}\n.p5toy-paused .p5toy-triangle-2 {\n\t-webkit-transform: translate(0, 50%);\n\ttransform: translate(0, 50%);\n}\n/**/\n\n/* http://brm.io/dat-gui-light-theme/ */\n#p5toy-container .dg.main.taller-than-window .close-button {\n    border-top: 1px solid #ddd;\n}\n\n#p5toy-container .dg.main .close-button {\n    background-color: #ccc;\n}\n \n#p5toy-container .dg.main .close-button:hover {\n    background-color: #ddd;\n}\n\n#p5toy-container .dg {\n    color: #555;\n    text-shadow: none !important;\n}\n\n#p5toy-container .dg.main::-webkit-scrollbar {\n    background: #fafafa;\n}\n\n#p5toy-container .dg.main::-webkit-scrollbar-thumb {\n    background: #bbb;\n}\n \n#p5toy-container .dg li:not(.folder) {\n    background: #fafafa;\n    border-bottom: 1px solid #ddd;\n}\n \n#p5toy-container .dg li.save-row .button {\n    text-shadow: none !important;\n}\n\n#p5toy-container .dg li.title {\n    background: #e8e8e8;\n}\n\n#p5toy-container .dg .cr.function:hover,#p5toy-container .dg .cr.boolean:hover {\n    background: #fff;\n}\n \n#p5toy-container .dg .c input[type=text] {\n    background: #e9e9e9;\n}\n \n#p5toy-container .dg .c input[type=text]:hover {\n    background: #eee;\n}\n \n#p5toy-container .dg .c input[type=text]:focus {\n    background: #eee;\n    color: #555;\n}\n \n#p5toy-container .dg .c .slider {\n    background: #e9e9e9;\n}\n\n#p5toy-container .dg .c .slider:hover {\n    background: #eee;\n}\n\n/**/\n\n#p5toy-container .dg.ac {\n\tposition: relative;\n}\n\n#p5toy-container .dg.main.a {\n\tmargin-right: 0;\n}\n\n#p5toy-container .close-button {\n\theight: 0;\n\tvisibility: hidden;\n\topacity: 0;\n}\n\n#p5toy-container .dg li {\n\ttransition: none;\n}\n\n#p5toy-container .dg .c input[type=text] {\n    background: #f5f2f0;\n}\n\n#p5toy-container .dg .cr.string input[type=text] {\n\tcolor: #35b928;\n}\n\n#p5toy-container .dg .cr {\n\tborder-left: 4px solid #e8e8e8 !important;\n}\n\n#p5toy-container .dg li.folder {\n\tborder-left: none;\n}\n\n#p5toy-container .cr.color {\n\toverflow: visible;\n}\n\n#p5toy-container .closed .cr.color {\n    overflow: hidden;\n}\n\n#p5toy-container .dg .c {\n\tposition: relative;\n}", ""]);
+	exports.push([module.id, "\n.p5toy-root {\n\tposition: relative;\n\tdisplay: -webkit-box;\n\tdisplay: -ms-flexbox;\n\tdisplay: flex;\n\t-ms-flex-wrap: nowrap;\n\t    flex-wrap: nowrap;\n\t-webkit-filter: drop-shadow( 0px 2px 3px rgba(0,0,0,0.3) );\n\t        filter: drop-shadow( 0px 2px 3px rgba(0,0,0,0.3) );\n\toutline: none;\n}\n\n/*.p5toy-canvas, .p5toy-root.side .p5toy-menu {\n\tbox-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);\n}*/\n\n.p5toy-canvas {\n\tposition: relative;\n\tdisplay: -webkit-box;\n\tdisplay: -ms-flexbox;\n\tdisplay: flex;\n\t-webkit-box-pack: center;\n\t    -ms-flex-pack: center;\n\t        justify-content: center;\n\t-webkit-box-align: center;\n\t    -ms-flex-align: center;\n\t        align-items: center;\n\tbackground: -webkit-repeating-linear-gradient(135deg, #ededed, #ededed 10px, #f5f5f5 10px, #f5f5f5 20px );\n\tbackground: repeating-linear-gradient(-45deg, #ededed, #ededed 10px, #f5f5f5 10px, #f5f5f5 20px );\n\tmin-width: 240px;\n\tmin-height: 240px;\n}\n\n.p5toy-menu {\n\t-webkit-transition: 200ms ease;\n\ttransition: 200ms ease;\n\toverflow: hidden;\n}\n.p5toy-root.side .p5toy-menu {\n\tmargin-left: 20px;\n\tbackground: #fff;\n}\n.p5toy-root.overlay .p5toy-menu {\n\topacity: 0;\n\tposition: absolute;\n\ttop: 0;\n\tright: 0;\n}\n.p5toy-root.overlay:hover .p5toy-menu {\n\topacity: 0.4;\n}\n.p5toy-root.overlay .p5toy-menu:hover {\n\topacity: 1;\n}\n.p5toy-root.noGUI .p5toy-menu {\n\tbackground: transparent;\n}\n\n.p5toy-buttons {\n\tdisplay: -webkit-box;\n\tdisplay: -ms-flexbox;\n\tdisplay: flex;\n}\n.p5toy-root.noGUI .p5toy-buttons {\n\t-webkit-box-orient: vertical;\n\t-webkit-box-direction: normal;\n\t    -ms-flex-direction: column;\n\t        flex-direction: column;\n}\n.p5toy-root.noButtons .p5toy-buttons {\n\tdisplay: none;\n}\n\n.p5toy-button {\n\tdisplay: -webkit-box;\n\tdisplay: -ms-flexbox;\n\tdisplay: flex;\n\t-webkit-box-pack: center;\n\t    -ms-flex-pack: center;\n\t        justify-content: center;\n\t-webkit-box-align: center;\n\t    -ms-flex-align: center;\n\t        align-items: center;\n\twidth: 60px;\n\theight: 60px;\n\tcursor: pointer;\n\tposition: relative;\n}\n\n.p5toy-play {\n\tbackground: #6eb3ee;\n}\n\n.p5toy-snapshot {\n\tbackground: #eed56e;\n}\n\n.p5toy-record {\n\tbackground: #cd5c5c;\n}\n\n.p5toy-close {\n\tbackground: #424242;\n}\n\n.p5toy-close * {\n\t-webkit-backface-visibility: hidden;\n\t        backface-visibility: hidden;\n}\n\n.p5toy-play-bars, .p5toy-play-skew {\n  position: absolute;\n  width: 60%;\n  height: 60%;\n  overflow: hidden;\n}\n\n.p5toy-play-bars:before, .p5toy-play-bars:after {\n  content: \"\";\n  position: absolute;\n  width: 33%;\n  height: 100%;\n  background: white;\n  -webkit-transition: 150ms ease-in-out;\n  transition: 150ms ease-in-out;\n}\n.p5toy-play-bars:after {\n  right: 0;\n}\n.p5toy-play.paused .p5toy-play-bars:before, .paused .p5toy-play-bars:after {\n  width: 50%;\n}\n\n.p5toy-play-skew {\n  background-color: inherit;\n  visibility: hidden;\n}\n.p5toy-play-skew:before, .p5toy-play-skew:after {\n  content: \"\";\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  background-color: inherit;\n  visibility: visible;\n  border-radius: 50%;\n  -webkit-transform-origin: 0 50%;\n          transform-origin: 0 50%;\n  -webkit-transition: 200ms ease-in-out;\n  transition: 200ms ease-in-out\n}\n.p5toy-play-skew:before {\n  -webkit-transform: translate(50%, -100%);\n          transform: translate(50%, -100%);\n}\n.p5toy-play-skew:after {\n  -webkit-transform: translate(50%, 100%);\n          transform: translate(50%, 100%);\n}\n.p5toy-play.paused .p5toy-play-skew:before {\n  -webkit-transform: translateY(-100%) skewY(0.464rad);\n          transform: translateY(-100%) skewY(0.464rad);\n  border-radius: 0;\n}\n.p5toy-play.paused .p5toy-play-skew:after {\n  -webkit-transform: translateY(100%) skewY(-0.464rad);\n          transform: translateY(100%) skewY(-0.464rad);  \n  border-radius: 0;\n}\n\n.p5toy-bg-button {\n    width: 100%;\n    height: 100%;\n    top: 0;\n    left: 0;\n    background-repeat: no-repeat;\n    background-size: 75%;\n    background-position: center;\n}\n\n.p5toy-snapshot-button {\n    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAFT0lEQVR4Xu2c8VXUQBDGZypQK1AqECoQOtAKlAqECtQKhAqECsAKhAqECoQKhArG98EGjyPZneR2M7vH5D3+IblM8v1mdjczkzD5ZqoAm1p34+QAjJ3AATgAYwWMzXsEOABjBYzNewQ4gP8KiMgnIvpRWJMjZt4tbEN9+moiYCbxO2GqgVAFgJnFrwqCOQAj8auBYArAWPwqIJgBqER8cwgmACoT3xTC7AAqFd8MwmgAIvKGiD4T0TYRbaoXvOt94AURnRHRITNfjbnVUQBE5DsR7Y0x8AyPPWDmfe19qwGIyG/3eK2sdMbMO5qjVQBE5CAMO5pz+jH3CmA4So4WSQBhzP/jqk5SYCM1J2gAuPdP0l4XBRoAPvZPB3DBzFuxn2sAyHT7/ktmjmrsAAr7iAMoLHDq9A4gpVDh/Q6gsMCp068TgPOQb0HO5YaZkX952EQEeamXIUeFPNW7lDhz7G8dwDURfSWiU2a+GSOYiAAGivx4Gn095rc5j20VwJ3wzHyUQ4yQAgfI2UG0COAwiD/K41OgQkQAAlLps20tAbjFkMHMpyXVEZH3RITIelHSTnfuVgBA/O3libWUQGHCxmReHEILANTiB+E+hroEJtmuIocVEYYsiPpTA3IuCC0A+JAadkQEomP8RjlUs6EsiEn8OHZwGI5ONCecekztAKJFi1CLQK8o1vVTNkTEbiwnX7rYVDMALDU3h9b3IgLR4Z0YalbZMDTtDA1LYXWEIazIErVmAPDM3nV+EP/XKqr3/HYrAqFYV3atAK6ZuXc8D8MOikCrev4yA0QCIPS2jYgI/p89CmoFEPN+eP7UMT8VNIPdCiKClAXabrJutQJ41Tf2z9Q117vqCnPB36zqE1GNAM6ZudfDRQTdF9ql5lStrph5o+/HIoJVU9Ysao0AvjEz1vSPtvBghLF/jq13QhYRXNeXnBdQIwAsCeFpywDmbH8ZcgJEZtbVV40Ahrwve/hHPLl3GCwRhdUBGLqgmXtPB/t1RCRrG05LALLeeGocjzhC1utwAAMkHMDTSRj5mLcpz820/5KZe18uWfshKKQDHnU0QNQSa3CfhPsVqHkZinJl1vpAdXMAEfmD2IJjWjTnxlIRRTKSS4EYy8RmfxapMQKghyfjgldYRABM7zMzUg9PtsKTcSz6nlU6OpaRRDYUq6TcLSPovkAJdKggUyQTW+sQBM/3kiTqBakHm9wPJgv24IlIzPW2IIa6MLrkVo2EaN9RKMQgDV6kDlFzBICFpi0FhfupRRK0tKPdcfDzAc+5LaULBk1jFroWxnQ3o+VlT9Hwlf3Ba3lEqT0CcL3Rvp3FGwr5eoiGwgm6Jrrc0eVCayLeJXiS6ugpACEXhOJL7u6LR6ZaADAKQmrO0uwPIIuLj2tpBUAHASujOdrT0e5Y1PM7R2gJQHfNeEBDvqjECxoouCc/oKGJIu0xLQLAvam6m7UiTOiu1p46eVyrALobAwhExPHYiAjre7S1w+OLrPGT6jc2B6TuB5nK7u924DVVPLRhhdT9pc5ZfH/rEVBcoNIGHEBphRPndwAOwFgBY/MeAWsAYM5+HWO5spsf7D96eFJOmSydrk3Zb3x/8tOVmoIMHmL8s5XTPGH1z1bCrkfBJPWT3n+XLdWeWkR8LtCKdf+5BNQtkpsagEdCUsvuAJXnqyfhZbPhPV4kuJBvmaubWX33RgeiIoc8Fb6cXu7z9UY3t9ZmRw1Ba62E0c05ACPhJ88Bxte7duY9AoyROgAHYKyAsXmPAAdgrICxeY8AB2CsgLF5jwAHYKyAsXmPAAdgrICxeY8AYwD/AAgzrH/GSVQUAAAAAElFTkSuQmCC);\n}\n\n.p5toy-png {\n\tvisibility: hidden;\n\tbackground-color: #eed56e;\n\tbackground-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAFd0lEQVR4Xu2c7XXVMAyGrQloJwAmgE5AOwFsQJkAmAA6Ae0ElAmACWgnoJ0ANqBMIM7bOj25vo4lx04drpVz7q8kdqJHryR/5JKzo6kFqGnv1rkzAI2dwAAYgMYWaNy9KcAANLZA4+5NAbsGgJmfOOfeOucOnXPPG79fre6vnHMXzrkzIvpdq1G0U1UBzPzJOfeu5gOusK1TInpf67mqAWDmnzvk8ZJ9r4joQLpIc74KAGY+9WFH0+euXINwVKz2YgA+5v/aFatmvsfT0pxQA0CP3j9wKlZBDQA9xf5QIMW5oAYAzpTtTl1OREU2LLoZlmTmJIDSB2xNa+n3MwACYQPQWAIGwACkLbC0hzS2/+I5znKA5YDWPt5W4aYAU4ApoMgCloRtJFzkQNLNSzuY5QDLAZIPtj1vCmhrfxuINba/ATAAgQV2dN9PKefZ+4ayqqBO9v2UwsjaN6QG0Nm+n1II6rViFYBO9/2UQlDtmBABdL7vpxSCuG9IA6DnfT+lAEQVaAD0vO+nFICYCzQAut73U0pA2pazBIAjxUPjuwF8P/BScW3YHr4/+Dxx3xfn3Hlw7ofQx3d/zw0R4RsAjH7RB36v/O+x4jmjlzw4AKnD8VMy855/+UkQsfaYGYZ6EXnjEyL6GPQxpeBr59wxEWEQlTyYGW1+kK6LnZfsUV0BUoexh2RmeO1r7QswM9QT82wtABj/kIhutEZl5uOE8iabkeyxOAAv57GE/8a8jpnx6c+W1KdeYAKaFsBB+AzMjHADJ4AqvxHRWWjVhPJWDSAm363yjJnxsQM+cdo4EgAQo8PvEjQAvhARvPn+mPDucyJ6o7guKaI1KGAqfu6PQ8BUWEm9QEQFGgAx7//jPT805sZAas6gdM0Ajoaqw1ce0bguAAhVIAII20vkEzwWclP4VeRGkpdyyJoBzFIAvHD8WVCgAgnAJREB9Dj8zK5wJOPj/FoBxOKwKgd4jwWE23rfl7Lw0kfOOQMQkTgS3pD0UPahwggHSzAkEipCSjIJewAYiCGW35aRozq9BoATwbOzxgPNFaCRKTPDoBuVyXBfImbfG3ukAiyGpAZiYgiSDCbtkpAcaOu8ZKDaHQbxFzU3jI8aPHokAMD7UaWMVYCYawBSUL23YhoBRo96/fh+oWoJVYCpBUyfj5PseCpCVIBzbgwQuWqjCqrtkA8xEi6qMgQAoQr2wumFwGCYcNsPAE1Na+CyjVLZ55us2WEppP3vAGCTrcSbUABOxQZiAIkqKjwMgHLgNLn0FwkZsUoJ4fCrAYhYQAlga1wxNBUBsBG2RtchFGEsglL4tlzGSFgIaVINs9qBmPjgijI0bCOqgomkeUFEmoWjjT58AYF5I/XRQw4YjBFVQaJqwUIMYrxqTYCZMVWNCguls/roCQCMsqUCoWwch5rLIHnD0M9Gy5Jbo3QNhQcHoHmolV8DKFlennqfGgAgVXiCHfkWuCai5B8XasYBtjEr3/DDHVU2ZsWW/uY/Ul93lm9NhL1sc+4srxG9H62KIWjompktF+g5iLH/fpyjb9OUoLSVyvNnAfDhCDkBQ3YM3a06urMkNnphtx4WhLL+2lgdgqboS/PjUh2s9Kpmly39fgZAQGsAmvn+XccGwACkLbC0hzS2vynAADROUgbAACz618xWhjZ2MANgAFpH+bZVnilg1xWwbv8uf7rSua4aCuh5nUA97z+FugaAnteMs+b+YxBqAOh5zVhc85WCXDEAP2PYowqKvR+2qwLAQ+gpFxTH/kEZ1QB0pIQqnr8IAA9hF9eMZ6/5PkgOkDqx89MWqBqCzND5FjAA+TareocBqGrO/MYMQL7Nqt5hAKqaM78xA5Bvs6p3GICq5sxv7B9SK7WO60ToTAAAAABJRU5ErkJggg==);\n\tposition: absolute;\n\tz-index: 10;\n\topacity: 0;\n\t-webkit-transition: 300ms;\n\ttransition: 300ms;\n}\n\n.p5toy-snapshot.download .p5toy-png {\n\tvisibility: visible;\n\topacity: 1;\n}\n\n.p5toy-record-button {\n\theight: 60%;\n\twidth: 60%;\n\tbackground: white;\n\tborder-radius: 50%;\n\tposition: relative;\n\t-webkit-transition: 300ms ease;\n\ttransition: 300ms ease;\n}\n\n.p5toy-record.recording .p5toy-record-button {\n\tborder-radius: 0;\n}\n\n.p5toy-record.recording .p5toy-record-progress-1, .p5toy-record.recording .p5toy-record-progress-2 {\n\tdisplay: block;\n}\n\n.p5toy-record-progress-1, .p5toy-record-progress-2 {\n\tbackground: #79c784;\n\tmargin-top: 0;\n\tdisplay: none;\n}\n\n.p5toy-record-progress-1 {\n\theight: 20.5%;\n\twidth: 0;\n\tfloat: left;\n}\n\n.p5toy-record-progress-2 {\n\theight: 0;\n\twidth: 100%;\n}\n\n.p5toy-record.download .p5toy-record-progress-2 {\n    -webkit-transition: 200ms ease-out;\n    transition: 200ms ease-out;\n    margin-left: -33.3%;\n    margin-top: -33.3%;\n    width: 166.67%;\n    height: 166.67%;\n}\n\n.p5toy-gif {\n\tvisibility: hidden;\n\tbackground-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAFA0lEQVR4Xu2djXHUMBCFdysAKgAqgFRAUgGhAqACkgoIFZBUQFIBUAFJBSQVkHQQKljmMbqM4/Od9Xzrk3xezzBh5nT6eZ9WWkkrn0o8RRXQoqVH4RIACneCABAACitQuPiwgABQWIHCxYcF7DoAM9sXkfcigr8vCrfXq/hbEbkUkQtVxd/Bz2gWYGZPReR7En5wBSfwRQB4p6r3Q+o6CoAk/i8ReT2kUhP8zrWIHAyBMBYAiI8hZ07PpaoesA12B5DGfACY4wMroOaEMQCcp0l3jgAwKX9gGj4GgD875O0wWiLtraq+ZL40BgBjKrBraVWV0pRKnCOWma0FwFYwp8xtpvFuXwAg6QUAUjDv5AHAW1EyvwBACuadPAB4K0rmFwBIwbyTBwBvRcn8AgApmHfyAOCtKJlfACAF804eALwVJfMLAKRg3skDgLeiZH4BgBTMO3kA8FaUzK86AGaGWJ9P6RB+V6IgEOWAs90zVUUM0MNTFQAz+yoiR2QnmlryU1U9XlS6GgBm9ntGcT8PISdVADCz0zTsTK03b1JfDEdHxQGkMR+RD3N8EPGwtu3smTd9JjzT3r/obGd9lr8NAHMa+9tWDu9orae3DQCzjvvpG3drBnAnIj+Sf33fjqE0M/QshLQjqBf/x98njQZfqepSwG97UmQFaLiX8Pvf9Anc9zlb/pA5gLWAKxE5YYNWzawtSAAA/T43rNVDjlUVLiv9BIAVkhEAPqoqIqUfPcmNfZuGmcWVJdwuwQSHZT96+q0nADP7nNEDENW88RWqWoagzjBtYusCMDAfNAUZPAQRnSaD0/okNQD4C+Ha13XM7JuIULHzraYGgMw5YKn3O92aCQCZAJbGfjOD+4lxf5MnAGQC2FNVjOEPT8cYjDXB0gTdogOfv+mXbwKg794W1h3NNcfgjlJ8DuiqQAeATjFb0E5EpOm9DAbQp2aHx9X3lZWfBwDyilCyapdVMPIqDkBEnnV4QO3VM/z9R0OQqn4JC8gwvAyfeumurJlhTni1Lvt2zzEztyEoo84ZLc9LUoMFLG0/5JwhBIA8wDl7QdequtcaTrCqxbCz0tMIAH4AkFPXMARXD+uB511FBQBfACvfHmJm2I5ovzsIVvMovCXmgBVAiAlt8CtckmsYk3AXAwIAvo5t5iNVvcg0sObqOQA4AFhkgQkY4z/+3XS92CgdSWJ+wPB02LE3P3glTHYatq88Sl+DG7pRA6b+5W0A6F1UTV3ENfW/YReUfVoMOZSfY1jiQscqArNwTBihiSu69uhDUHIR52gFdQTnLsDnbLD1jX8T+vynqsIz692K2YoFNCDMwRL+9/xGm13fCEZPwu1em+J8UEH472u3nCfU4+Ht4JAGt2PqvaI0ZKHGmmht0PoWdWz7NraADotwNdEAQCrg3UPI4kdP7t2+sAASWQAgBfNOHgC8FSXzCwCkYN7JA4C3omR+AYAUzDt5APBWlMwvAJCCeScPAN6KkvlNHgDZ3sklr2EvCLuHndFvk1OTr/CdqlI3LcfYiogf8SHAjQEA5wLxM1aZENwBoFzPKz+Z7aghWe+1q65KjgUA4eg4UdqVE7I+wDhB26/mpwyTFQACQhE3fgNJX+sLf46XkRwOER/1HsUCmoKkS9qLkPRd8Y5wzRYWfs6+BabdWUYHULh3Vl98ACiMKAAEgMIKFC4+LCAAFFagcPFhAQGgsAKFi/8Ho2JJjqqRr/AAAAAASUVORK5CYII=);\n\tposition: absolute;\n\tz-index: 10;\n\topacity: 0;\n\t-webkit-transition: 300ms ease-in;\n\ttransition: 300ms ease-in;\n}\n\n.p5toy-record.download .p5toy-gif {\n\tvisibility: visible;\n\topacity: 1;\n}\n\n.p5toy-close-button {\n    position: relative;\n    width: 65%;\n    height: 65%;\n    -webkit-transition: 500ms;\n    transition: 500ms;\n}\n.p5toy-root.overlay .p5toy-close-button {\n\t-webkit-transform: rotate(-45deg);\n\t        transform: rotate(-45deg);\n}\n\n.p5toy-close-bar {\n\tposition: absolute;\n    background: white;\n    width: 20%;\n    height: 100%;\n    left: 50%;\n}\n.p5toy-close-bar-1 {\n\t-webkit-transform: translateX(-50%) rotate(45deg);\n\t        transform: translateX(-50%) rotate(45deg);\n}\n.p5toy-close-bar-2 {\n\t-webkit-transform: translateX(-50%) rotate(-45deg);\n\t        transform: translateX(-50%) rotate(-45deg);\n}\n\n\n/* http://brm.io/dat-gui-light-theme/ */\n.p5toy-root .dg.main.taller-than-window .close-button {\n    border-top: 1px solid #ddd;\n}\n\n.p5toy-root .dg.main .close-button {\n    background-color: #ccc;\n}\n \n.p5toy-root .dg.main .close-button:hover {\n    background-color: #ddd;\n}\n\n.p5toy-root .dg {\n    color: #555;\n    text-shadow: none !important;\n}\n\n.p5toy-root .dg.main::-webkit-scrollbar {\n    background: #fafafa;\n}\n\n.p5toy-root .dg.main::-webkit-scrollbar-thumb {\n    background: #bbb;\n}\n \n.p5toy-root .dg li:not(.folder) {\n    background: #fafafa;\n    border-bottom: 1px solid #ddd;\n}\n \n.p5toy-root .dg li.save-row .button {\n    text-shadow: none !important;\n}\n\n.p5toy-root .dg li.title {\n    background: #e8e8e8;\n}\n\n.p5toy-root .dg .cr.function:hover,.p5toy-root .dg .cr.boolean:hover {\n    background: #fff;\n}\n \n.p5toy-root .dg .c input[type=text] {\n    background: #e9e9e9;\n}\n \n.p5toy-root .dg .c input[type=text]:hover {\n    background: #eee;\n}\n \n.p5toy-root .dg .c input[type=text]:focus {\n    background: #eee;\n    color: #555;\n}\n \n.p5toy-root .dg .c .slider {\n    background: #e9e9e9;\n}\n\n.p5toy-root .dg .c .slider:hover {\n    background: #eee;\n}\n\n/**/\n\n.p5toy-root .dg.ac {\n\tposition: relative;\n}\n\n.p5toy-root .dg.main.a {\n\tmargin-right: 0;\n}\n\n.p5toy-root .close-button {\n\theight: 0;\n\tvisibility: hidden;\n\topacity: 0;\n}\n\n.p5toy-root .dg li {\n\t-webkit-transition: none;\n\ttransition: none;\n}\n\n.p5toy-root .dg .c input[type=text] {\n    background: #f5f2f0;\n}\n\n.p5toy-root .dg .cr.string input[type=text] {\n\tcolor: #35b928;\n}\n\n.p5toy-root .dg .cr {\n\tborder-left: 4px solid #e8e8e8 !important;\n}\n\n.p5toy-root .dg li.folder {\n\tborder-left: none;\n}\n\n.p5toy-root .cr.color {\n\toverflow: visible;\n}\n\n.p5toy-root .closed .cr.color {\n    overflow: hidden;\n}\n\n.p5toy-root .dg .c {\n\tposition: relative;\n}\n\n.p5toy-root .dg.main {\n\twidth: auto !important;\n\theight: auto;\n\tmin-height: 240px;\n\toverflow-y: auto;\n\toverflow-x: hidden;\n}\n\n.p5toy-root.noGUI .dg.main {\n\tdisplay: none;\n}", ""]);
 
 	// exports
 
@@ -4716,7 +4505,7 @@
 /* 10 */
 /***/ function(module, exports) {
 
-	module.exports = "<div id=\"p5toy-container\">\n\t<div id=\"p5toy-mainbox\"><div id=\"p5toy-open\"></div></div>\n\t<div id=\"p5toy-sidebox\">\n\t\t<div id=\"p5toy-controls\">\n\t\t\t<div id=\"p5toy-play\">\n\t\t\t\t<div class=\"p5toy-play-button\">\n\t\t\t\t\t<div class=\"p5toy-left\"></div>\n\t\t\t\t\t<div class=\"p5toy-right\"></div>\n\t\t\t\t\t<div class=\"p5toy-triangle-1\"></div>\n\t\t\t\t\t<div class=\"p5toy-triangle-2\"></div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div id=\"p5toy-snapshot\">\n\t\t\t\t<a id=\"p5toy-png\" target=\"_blank\"></a>\n\t\t\t\t<div class=\"p5toy-snapshot-button\"></div>\n\t\t\t</div>\n\t\t\t<div id=\"p5toy-record\">\n\t\t\t\t<a id=\"p5toy-blob\" target=\"_blank\"></a>\n\t\t\t\t<div class=\"p5toy-record-button\">\n\t\t\t\t\t<div class=\"p5toy-record-progress-1\"></div>\n\t\t\t\t\t<div class=\"p5toy-record-progress-2\"></div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div id=\"p5toy-close\">\n\t\t\t\t<div class=\"p5toy-x-button\">\n\t\t\t\t\t<div class=\"p5toy-bar p5toy-bar-1\"></div>\n\t\t\t\t\t<div class=\"p5toy-bar p5toy-bar-2\"></div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>";
+	module.exports = "<div class=\"p5toy-root side\" tabindex=\"0\" >\n\t<div class=\"p5toy-canvas\"></div>\n\t<div class=\"p5toy-menu\">\n\t\t<div class=\"p5toy-buttons\">\n\t\t\t<div class=\"p5toy-play p5toy-button\">\n\t\t\t\t<div class=\"p5toy-play-bars\"></div>\n\t\t\t\t<div class=\"p5toy-play-skew\"></div>\n\t\t\t</div>\n\t\t\t<div class=\"p5toy-snapshot p5toy-button\">\n\t\t\t\t<a class=\"p5toy-png p5toy-bg-button\" target=\"_blank\"></a>\n\t\t\t\t<div class=\"p5toy-snapshot-button p5toy-bg-button\"></div>\n\t\t\t</div>\n\t\t\t<div class=\"p5toy-record p5toy-button\">\n\t\t\t\t<a class=\"p5toy-gif p5toy-bg-button\" target=\"_blank\"></a>\n\t\t\t\t<div class=\"p5toy-record-button\">\n\t\t\t\t\t<div class=\"p5toy-record-progress-1\"></div>\n\t\t\t\t\t<div class=\"p5toy-record-progress-2\"></div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"p5toy-close p5toy-button\">\n\t\t\t\t<div class=\"p5toy-close-button\">\n\t\t\t\t\t<div class=\"p5toy-close-bar p5toy-close-bar-1\"></div>\n\t\t\t\t\t<div class=\"p5toy-close-bar p5toy-close-bar-2\"></div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>";
 
 /***/ }
 /******/ ]);

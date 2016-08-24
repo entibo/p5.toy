@@ -2,5 +2,7 @@
 var dat = require("./dat.gui");
 
 p5.prototype.createGUI = function(params) {
-	return new dat.GUI(params);
+	var context = this._isGlobal ? window : this;
+	context.gui = new dat.GUI(params);
+	return context.gui;
 }

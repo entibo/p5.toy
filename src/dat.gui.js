@@ -1584,9 +1584,6 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
     var _this = this;
 
-    this.minHeight = null;
-    this.maxHeight = null;
-
     /**
      * Outermost DOM Element
      * @type DOMElement
@@ -1998,6 +1995,48 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
       {
 
         /**
+         * @param property
+         * @param value
+         * @returns {dat.controllers.Controller} The new controller that was added.
+         * @instance
+         */
+        def: function(property, value) {
+
+          window[property] = value;
+
+          return add(
+              this,
+              window,
+              property,
+              {
+                factoryArgs: Array.prototype.slice.call(arguments, 2)
+              }
+          );
+
+        },
+        
+        /**
+         * @param property
+         * @param value
+         * @returns {dat.controllers.Controller} The new controller that was added.
+         * @instance
+         */
+        defColor: function(property, value) {
+
+          window[property] = value;
+
+          return add(
+              this,
+              window,
+              property,
+              {
+                color: true
+              }
+          );
+
+        },
+
+        /**
          * @param object
          * @param property
          * @returns {dat.controllers.Controller} The new controller that was added.
@@ -2113,42 +2152,23 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
           this.closed = true;
         },
 
-        setMinHeight: function(h) {
-          this.minHeight = h;
-          this.onResize();
-        },
-
-        setMaxHeight: function(h) {
-          this.maxHeight = h;
-          this.onResize();
-        },
-
-        setParent: function(id) {
-          var e;
-          if(this.autoPlace) e = this.domElement.parentNode;
-          else e = this.domElement;
-          document.getElementById(id).appendChild(e);
-        },
-
         onResize: function() {
 
           var root = this.getRoot();
 
           if (root.scrollable) {
 
+            var top = dom.getOffset(root.__ul).top;
             var h = 0;
-            var minHeight = this.minHeight || 0;
-            var maxHeight = this.maxHeight || window.innerHeight;
-            var closeButtonHeight = dom.getHeight(root.__closeButton);
 
             common.each(root.__ul.childNodes, function(node) {
               if (! (root.autoPlace && node === root.__save_row))
                 h += dom.getHeight(node);
             });
 
-            if (Math.max(minHeight, maxHeight) - closeButtonHeight < h) {
+            if (window.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
               dom.addClass(root.domElement, GUI.CLASS_TOO_TALL);
-              root.__ul.style.height = Math.max(minHeight, maxHeight) - closeButtonHeight + 'px';
+              root.__ul.style.height = window.innerHeight - top - CLOSE_BUTTON_HEIGHT + 'px';
             } else {
               dom.removeClass(root.domElement, GUI.CLASS_TOO_TALL);
               root.__ul.style.height = 'auto';
@@ -2316,16 +2336,8 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
   function add(gui, object, property, params) {
 
-    // Assume global mode, attach property to window
-    if(typeof object !== "object") {
-      var val = property;
-      property = object;
-      object = window;
-    }
-
     if (object[property] === undefined) {
-      if(object === window && val !== undefined) object[property] = val;
-      else throw new Error("Object " + object + " has no property \"" + property + "\"");
+      throw new Error("Object " + object + " has no property \"" + property + "\"");
     }
 
     var controller;

@@ -7,7 +7,7 @@ module.exports = {
 	entry: "./app.js",
 	output: {
 		path: __dirname + "/build",
-		filename: "p5.toy.js"
+		filename: "p5.toy.min.js"
 	},
 	resolve: {
 		extensions: ["", ".js"]
@@ -23,5 +23,7 @@ module.exports = {
 	postcss: function () {
         return [autoprefixer];
     },
-	plugins: []
+	plugins: [
+		new webpack.optimize.UglifyJsPlugin()
+	]
 };

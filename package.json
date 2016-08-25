@@ -1,14 +1,20 @@
 {
   "name": "p5.toy",
   "version": "0.1.11",
-  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/entibo/p5.toy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/entibo/p5.toy/issues"
+  },
+  "author": "Thibaut Guénédal <contact@entibo.fr>",
+  "license": "MIT",
   "main": "app.js",
   "scripts": {
     "start": "webpack",
     "build": "webpack && webpack --config webpack.config.prod.js"
   },
-  "author": "Thibaut Guénédal <contact@entibo.fr>",
-  "license": "MIT",
   "devDependencies": {
     "webpack": "~1.13.1",
     "html-loader": "~0.4.3",

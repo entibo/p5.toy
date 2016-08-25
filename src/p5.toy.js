@@ -1,7 +1,8 @@
 
 p5.prototype.toggleLoop = function() {
-	if(this._loop) this.noLoop();
-	else this.loop();
+	var context = this._isGlobal ? window : this;
+	if(this._loop) context.noLoop();
+	else context.loop();
 }
 
 p5.prototype.isLooping = function() {
@@ -21,21 +22,22 @@ p5.prototype.isLooping = function() {
  * // The canvas will now be cleared before every rect() call
  */
 p5.prototype.registerInstanceMethod = function(name, when, fn) {
+	var context = this._isGlobal ? window : this;
 	if(when === undefined || !(when == "pre" || when == "post")) {
 		when = "post";
 	}
-	if(!this.hasOwnProperty("_registeredInstanceMethods")) {
-		this._registeredInstanceMethods = {};
+	if(!context.hasOwnProperty("_registeredInstanceMethods")) {
+		context._registeredInstanceMethods = {};
 	}
-	if(!this._registeredInstanceMethods.hasOwnProperty(name)) {
-		this._registeredInstanceMethods[name] = {};
+	if(!context._registeredInstanceMethods.hasOwnProperty(name)) {
+		context._registeredInstanceMethods[name] = {};
 	}
-	if(!this._registeredInstanceMethods[name].hasOwnProperty(when)) {
-		this._registeredInstanceMethods[name][when] = [];
-		var _method = this[name];
+	if(!context._registeredInstanceMethods[name].hasOwnProperty(when)) {
+		context._registeredInstanceMethods[name][when] = [];
+		var _method = context[name];
 		if(when == "pre") {
-			this[name] = function() {
-				this._registeredInstanceMethods[name]["pre"].forEach(function(f) {
+			context[name] = function() {
+				context._registeredInstanceMethods[name]["pre"].forEach(function(f) {
 					if(typeof(f) === "function") {
 						f.call(this);
 					}
@@ -44,9 +46,9 @@ p5.prototype.registerInstanceMethod = function(name, when, fn) {
 			};
 		}
 		else {
-			this[name] = function() {
+			context[name] = function() {
 				var r = _method.apply(this, arguments);
-				this._registeredInstanceMethods[name]["post"].forEach(function(f) {
+				context._registeredInstanceMethods[name]["post"].forEach(function(f) {
 					if(typeof(f) === "function") {
 						f.call(this);
 					}
@@ -55,7 +57,7 @@ p5.prototype.registerInstanceMethod = function(name, when, fn) {
 			}
 		}
 	}
-	this._registeredInstanceMethods[name][when].push(fn);
+	context._registeredInstanceMethods[name][when].push(fn);
 };
 
 //
@@ -139,6 +141,7 @@ p5.prototype.createToy = function(parent) {
 	});
 
 	snapBtn.addEventListener("click", function() {					// Snapshot
+		context.snapshotButton();
 		snapBtn.classList.add("download");
 		var dataUri = context._curElement.elt.toDataURL("image/png");
 		pngBtn.setAttribute("href", dataUri);
@@ -206,6 +209,7 @@ p5.prototype.createToy = function(parent) {
 	// Adding new methods to the instance/window
 	context.playButton = context.loop;
 	context.pauseButton = context.noLoop;
+	context.snapshotButton = function(){};
 	context.recordButton = context.startGif;
 	context.stopRecordButton = context.stopGif;
 	context.expandToy = function() {
@@ -260,6 +264,20 @@ p5.prototype.createToy = function(parent) {
 		}
 		else return context._buttonSize;
 	};
+
+	context.hideGUI();
+	// Show the GUI as soon as something is added to it
+	var methodNames = ["add", "addColor", "addFolder", "def", "defColor"];
+	methodNames.forEach(function(name) {
+		(function(m) {
+			gui[name] = function() {
+				if(gui.__controllers.length === 0) {
+					context.showGUI();
+				}
+				return m.apply(gui, arguments);
+			};
+		})(gui[name]);
+	});
 
 	context.gui = gui;
 

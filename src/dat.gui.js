@@ -1995,6 +1995,14 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
       {
 
         /**
+         * @param {Object}
+         * @instance
+         */
+        setObject: function(o) {
+          this._defTarget = o;
+        },
+
+        /**
          * @param property
          * @param value
          * @returns {dat.controllers.Controller} The new controller that was added.
@@ -2002,11 +2010,14 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
          */
         def: function(property, value) {
 
-          window[property] = value;
+          var object = this._defTarget || window;
+          if(value !== undefined) {
+            object[property] = value;
+          }
 
           return add(
               this,
-              window,
+              object,
               property,
               {
                 factoryArgs: Array.prototype.slice.call(arguments, 2)
@@ -2023,11 +2034,14 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
          */
         defColor: function(property, value) {
 
-          window[property] = value;
+          var object = this._defTarget || window;
+          if(value !== undefined) {
+            object[property] = value;
+          }
 
           return add(
               this,
-              window,
+              object,
               property,
               {
                 color: true

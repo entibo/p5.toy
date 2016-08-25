@@ -1,6 +1,8 @@
 # p5.toy
 Wraps [gif.js](https://github.com/jnordberg/gif.js) and [dat.gui](https://github.com/dataarts/dat.gui) into an intuitive graphical user interface for [p5.js](http://p5js.org/) sketches.  
-It works both in global and instance modes.
+
+## Demo
+_wip_
 
 ## Usage
 Include p5.toy after p5 in your html. For example:
@@ -14,31 +16,38 @@ Include p5.toy after p5 in your html. For example:
 Now you can simply call [createToy()](#createtoyparent):
 ```javascript
 function setup() {
-	createCanvas(400, 400);
-	createToy();
+  createCanvas(400, 400);
+  createToy();
 }
 ```
 That will create the UI around your canvas!
 
+## Features
+* Capture a snapshot
+* Make a gif from your sketch, with or without the UI
+* Bind your variables to controllers
+* Flexible layout
+* Works in global and instance modes
+
+## Todo
+
+* Gif transparency
+* Custom buttons
+* ???
+
 ## Documentation
 
-##### [startGif()](#startgifstop)
-##### [stopGif()](#stopgif)
-##### [abortGif()](#abortgif)
-##### [Gif options](#gif-options)  
-##### [createGUI()](#createguiparams)  
-##### [createToy()](#createtoyparent)
-##### [expandToy()*](#expandtoy)
-##### [collapseToy()*](#collapsetoy)
-##### [showGUI()*](#showgui)
-##### [hideGUI()*](#hidegui)
-##### [addDefaultParams()*](#adddefaultparams)
-##### [showButtons()*](#showbuttons)
-##### [hideButtons()*](#hidebuttons)
-##### [buttonSize()*](#buttonsizevalue)
-##### [Button actions*](#button-actions)
+* [startGif()](#startgifstop)
+* [stopGif()](#stopgif)
+* [abortGif()](#abortgif)
+* [Gif options](#gif-options)  
+* [createGUI()](#createguiparams)  
+* [createToy()](#createtoyparent)
+* [addDefaultParams()*](#adddefaultparams)
+* [Layout methods*](#layout-methods)
+* [Button actions*](#button-actions)
 
-\* _only available after calling createToy_
+\* _only available after calling createToy()_
 
 
 #### startGif(stop)
@@ -64,7 +73,7 @@ function draw() {
   rect(0, 0, width/4, height/4);
   pop();
 
-  t #####= 0.01;
+  t += 0.01;
 }
 ```
 It returns a GIF instance on which you can add event listeners:
@@ -96,7 +105,7 @@ function draw() {
   rect(0, 0, width/4, height/4);
   pop();
 
-  t #####= 0.01;
+  t += 0.01;
   if(t >= 1) stopGif();
 }
 ```
@@ -133,15 +142,83 @@ The object is implied to be `window`, but can be changed with `setObject`.
   gui.defColor("myColor");
 ```
 
+#### createToy(parent)
+Creates a UI around the canvas.  
+The `parent` parameter is optional; by default it will be the canvas's parent.  
+Calling createToy() will allow you to use:
+* the `gui` variable, see [createGUI](#createguiparams)
+* the [addDefaultParams()](#adddefaultparams) method
+* [methods](#layout-methods) to change the toy's layout
+* [button actions](#button-actions) that define their behavior
 
+#### addDefaultParams()
+Populates the gui with the following structure:
+* Global settings
+  * Canvas width
+  * Canvas height
+  * Framerate
+* Gif settings
+  * Quality
+  * Framerate
+  * Workers
 
+#### Layout methods
+##### expandToy()
+##### collapseToy()
+##### showButtons()
+##### hideButtons()
+##### showGUI()
+##### hideGUI()
+The GUI is always hidden when it's empty
+##### buttonSize(value)
+Define the size of every button, in pixels (default: 60)
 
+#### Button actions
+Those functions are triggered by the buttons.  
+To change them, simply reassign them a function:
+```javascript
+stopRecordButton = abortGif; // default is stopGif
+playButton = function() {
+  t = 0;
+  loop();
+}
+```
+##### playButton
+Default: loop
+##### pauseButton
+Default: noLoop
+##### snapshotButton
+Default: (nothing)
+This function can be used to draw something right before the snapshot is taken:
+```javascript
+function setup() {
+  createCanvas(400, 400);
+  createToy();
+  snapshotButton = function() {
+    textSize(20);
+    textAlign(LEFT, CENTER);
+    text("Blue square on white background", 10, 15);
+    text("Copyright or something", 10, 35);
+  };
+}
+function draw() {
+  background("white");
+  noStroke();
+  fill("blue");
+  rect(75, 75, 300, 300);
+}
+```
+##### recordButton
+Default: startGif
+##### stopRecordButton
+Default: stopGif
+##### expandButton
+Default: expandToy
+##### collapseButton
+Default: collapseToy
 
+## Made with the following
 
-
-
-
-
-
-
-
+* [gif.js](https://github.com/jnordberg/gif.js) by **Johan Nordberg**
+* [dat.gui](https://github.com/dataarts/dat.gui) by **Google Data Arts Team**
+* [Webpack](https://github.com/webpack/webpack) by **Tobias Koppers**

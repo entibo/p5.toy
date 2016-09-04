@@ -188,26 +188,8 @@ Default: loop
 ##### pauseButton
 Default: noLoop
 ##### snapshotButton
-Default: (nothing)
-This function can be used to draw something right before the snapshot is taken:
-```javascript
-function setup() {
-  createCanvas(400, 400);
-  createToy();
-  snapshotButton = function() {
-    textSize(20);
-    textAlign(LEFT, CENTER);
-    text("Blue square on white background", 10, 15);
-    text("Copyright or something", 10, 35);
-  };
-}
-function draw() {
-  background("white");
-  noStroke();
-  fill("blue");
-  rect(75, 75, 300, 300);
-}
-```
+Default: (nothing)  
+*This function can be used to draw something right before the snapshot is taken.*
 ##### recordButton
 Default: startGif
 ##### stopRecordButton

@@ -4,7 +4,7 @@ var GIF = require("./gif");
 p5.prototype.registerMethod("init", function() {
 	this.gifWorkers = 2;
 	this.gifQuality = 100;
-	this.gifFps = 30;
+	this.gifFps = 60;
 	this._gif = null;
 	this._gifRendering = false;
 	this._gifStartFrameCount = null;

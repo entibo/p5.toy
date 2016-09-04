@@ -1,8 +1,7 @@
 # p5.toy
 Wraps [gif.js](https://github.com/jnordberg/gif.js) and [dat.gui](https://github.com/dataarts/dat.gui) into an intuitive graphical user interface for [p5.js](http://p5js.org/) sketches.  
 
-## Demo
-_wip_
+## [Demo and examples](http://entibo.github.io/p5.toy)
 
 ## Usage
 Include p5.toy after p5 in your html. For example:
@@ -115,9 +114,9 @@ Stops recording frames but doesn't render the gif.
 #### Gif options
 ###### gifWorkers (default: `2`)
 ###### gifQuality (default: `100`)
-###### gifFps     (default: `30`)
+###### gifFps     (default: `60`)
 More on those options: [gif.js#options](https://github.com/jnordberg/gif.js#options)  
-Note that the default framerate for a gif is 30 but your sketch is trying to reach 60. To make sure that what you see is what you'll get, either make gifFps 60 or reduce the sketch fps with [frameRate()](http://p5js.org/reference/#/p5/frameRate)  
+Note that the default framerate for a gif is 60 but your sketch might be running slower than that.
 #### createGUI(params)
 Equivalent to `new dat.GUI(params)`.  
 See [http://workshop.chromeexperiments.com/examples/gui/](the guide) to get started.

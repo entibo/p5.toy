@@ -73,10 +73,11 @@ p5.prototype.createToy = function(parent) {
 	var h = require("html!./toy.html");
 	var d = document.createElement("div");
 	d.innerHTML = h;
-	var root = d.childNodes[0];
+	var wrapper = d.firstElementChild;
+	var root = wrapper.firstElementChild;
 	var cvs = root.querySelector(".p5toy-canvas"),
 		menu = root.querySelector(".p5toy-menu");
-	parent.appendChild(root);
+	parent.appendChild(wrapper);
 	context._curElement.parent(cvs);
 
 	var	buttons = root.querySelector(".p5toy-buttons"),
@@ -94,12 +95,21 @@ p5.prototype.createToy = function(parent) {
 
 	context._buttonSize = 60;
 
+	var updateWrapper = function() {
+		var w = cvs.offsetWidth;
+		if(root.classList.contains("side")) {
+			w += 20 + menu.offsetWidth;
+		}
+		wrapper.style.width = w + "px";
+		wrapper.style.height = root.offsetHeight+"px";
+	}
 	var onResize = function() {
 		if(this._setupDone) context.resizeCanvas(context.width, context.height);
 		cvs.style.minHeight = cvs.style.minWidth = 4*context._buttonSize + "px";
 		gui.domElement.style.maxWidth = 4*context._buttonSize + "px";
 		gui.domElement.style.minHeight = 240 - buttons.offsetHeight + "px";
 		gui.domElement.style.maxHeight = Math.max(4*context._buttonSize, context.height) - buttons.offsetHeight + "px";
+		updateWrapper();
 	}.bind(this);
 	onResize();
 
@@ -141,7 +151,9 @@ p5.prototype.createToy = function(parent) {
 	});
 
 	snapBtn.addEventListener("click", function() {					// Snapshot
+		context.push();
 		context.snapshotButton();
+		context.pop();
 		snapBtn.classList.add("download");
 		var dataUri = context._curElement.elt.toDataURL("image/png");
 		pngBtn.setAttribute("href", dataUri);
@@ -215,10 +227,12 @@ p5.prototype.createToy = function(parent) {
 	context.expandToy = function() {
 		root.classList.add("side");
 		root.classList.remove("overlay");
+		updateWrapper();
 	};
 	context.collapseToy = function() {
 		root.classList.add("overlay");
 		root.classList.remove("side");
+		updateWrapper();
 	};
 	context.collapseButton = context.collapseToy;
 	context.expandButton = context.expandToy;
@@ -265,7 +279,6 @@ p5.prototype.createToy = function(parent) {
 		else return context._buttonSize;
 	};
 
-	context.hideGUI();
 	// Show the GUI as soon as something is added to it
 	var methodNames = ["add", "addColor", "addFolder", "def", "defColor"];
 	methodNames.forEach(function(name) {
